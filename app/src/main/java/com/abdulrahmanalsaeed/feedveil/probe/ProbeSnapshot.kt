@@ -11,7 +11,14 @@ data class ProbeSnapshot(
     val lastTextNodes: Int,
     val lastContentDescriptions: Int,
     val lastNodesInspected: Int,
-    val lastScannedAtEpochMs: Long
+    val lastScannedAtEpochMs: Long,
+    val provisionalContainerObservations: Long,
+    val unresolvedMarkerObservations: Long,
+    val placementClusters: Long,
+    val repeatedPlacements: Long,
+    val feedHintScans: Long,
+    val reelsHintScans: Long,
+    val unknownHintScans: Long
 )
 
 data class ScreenObservation(
@@ -20,5 +27,10 @@ data class ScreenObservation(
     val adBadgeCount: Int,
     val adMetadataCount: Int,
     val textNodeCount: Int,
-    val descriptionNodeCount: Int
+    val descriptionNodeCount: Int,
+    val provisionalContainers: Int,
+    val unresolvedMarkers: Int,
+    val placementClusters: Int,
+    val repeatedPlacements: Int,
+    val surfaceHint: com.abdulrahmanalsaeed.feedveil.detection.SurfaceHint
 )

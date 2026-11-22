@@ -3,8 +3,8 @@
     <string name="app_name">FeedVeil</string>
     <string name="service_name">FeedVeil read-only probe</string>
     <string name="accessibility_description">Read-only feasibility experiment: checks accessibility labels in the original Facebook app when you consent. No taps, scrolling, screen capture or stored post text.</string>
-    <string name="title">FeedVeil · Phase 0</string>
-    <string name="subtitle">Read-only Facebook accessibility probe</string>
+    <string name="title">FeedVeil · Phase 1 Preview</string>
+    <string name="subtitle">Read-only ad candidate and post boundary probe</string>
     <string name="warning">Read-only diagnostic build: observes Sponsored, ممول, Ad and • Ad when exposed by Facebook accessibility. Observations can repeat for the same ad. No scrolling, hiding or blocking.</string>
     <string name="permission_notice">Accessibility can technically read on-screen content and interact with apps. FeedVeil Phase 0 uses it only to inspect minimal visible UI labels in the original Facebook app. It does not save post contents, names, passwords, screenshots, or send data anywhere. You can pause or revoke permission at any time.</string>
     <string name="permission_title">Read before enabling accessibility</string>
@@ -33,4 +33,11 @@
     <string name="no_scans">No scans yet</string>
     <string name="privacy_footer">Only aggregated counters and your local consent/pause settings are stored. No Facebook content is retained. Not affiliated with Meta.</string>
     <string name="testing_hint">To test, grant access, open the original Facebook app, scroll manually, return here and tap Refresh. Record your observations manually using the Phase 0 test sheet.</string>
+    <string name="phase1_heading">Phase 1 — Candidate post association</string>
+    <string name="phase1_note">Only provisional containers, not verified ads. Placement clusters are not unique ads. No automatic actions.</string>
+    <string name="phase1_provisional">Provisional post-container observations: %1$d</string>
+    <string name="phase1_unresolved">Markers without safe post boundary: %1$d</string>
+    <string name="phase1_clusters">Recent placement clusters (estimate): %1$d</string>
+    <string name="phase1_repeated">Repeated placements suppressed: %1$d</string>
+    <string name="phase1_surface">Selected-tab hint scans — Feed: %1$d / Reels: %2$d / Unknown: %3$d</string>
 </resources>

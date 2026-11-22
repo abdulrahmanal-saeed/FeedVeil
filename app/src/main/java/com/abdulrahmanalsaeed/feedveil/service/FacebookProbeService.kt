@@ -1,33 +1,41 @@
 package com.abdulrahmanalsaeed.feedveil.service
 
 import android.accessibilityservice.AccessibilityService
+import android.graphics.Rect
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import com.abdulrahmanalsaeed.feedveil.detection.FeedContainerResolver
+import com.abdulrahmanalsaeed.feedveil.detection.RecentCandidateDeduper
+import com.abdulrahmanalsaeed.feedveil.detection.ScreenRect
+import com.abdulrahmanalsaeed.feedveil.detection.SurfaceHintResolver
+import com.abdulrahmanalsaeed.feedveil.detection.UiNodeFeature
+import com.abdulrahmanalsaeed.feedveil.probe.AdLabelObserver
 import com.abdulrahmanalsaeed.feedveil.probe.LocalProbeStore
 import com.abdulrahmanalsaeed.feedveil.probe.ProbeScope
 import com.abdulrahmanalsaeed.feedveil.probe.ScreenObservation
-import com.abdulrahmanalsaeed.feedveil.probe.AdLabelObserver
 
 /**
- * Phase 0 ONLY: passive, read-only and Facebook-only.
- *
- * This service intentionally contains NO click actions, gesture dispatch, scroll requests,
- * accessibility overlays, screenshots, network calls, or content persistence.
+ * Phase 1: privacy-minimized, read-only screen STRUCTURE experiment.
+ * No gestures, taps, masks, OCR, network or content persistence. A plausible container is
+ * never equivalent to a verified ad and may NOT be used to authorize automatic actions.
  */
 class FacebookProbeService : AccessibilityService() {
     private var lastScannedElapsedMs = 0L
+    private val resolver = FeedContainerResolver()
+    private val deduper = RecentCandidateDeduper()
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        if (event == null) return
-        if (!ProbeScope.mayRead(
+        if (event == null || !ProbeScope.mayRead(
                 packageName = event.packageName?.toString(),
                 consented = LocalProbeStore.isConsented(this),
                 active = LocalProbeStore.isActive(this)
             )
-        ) return
+        ) {
+            deduper.clear()
+            return
+        }
 
-        // Do not consume events from non-Facebook roots or unrelated windows.
         val root = rootInActiveWindow ?: return
         if (!ProbeScope.isTargetPackage(root.packageName?.toString())) return
 
@@ -35,57 +43,100 @@ class FacebookProbeService : AccessibilityService() {
         if (now - lastScannedElapsedMs < MIN_SCAN_INTERVAL_MS) return
         lastScannedElapsedMs = now
 
+        // Never use the returned text for logging, persistence, telemetry or account identity.
         LocalProbeStore.recordEvent(this)
-        val observation = inspectVisibleNodes(root)
+        val observation = inspectVisibleNodes(root, now)
         LocalProbeStore.recordScan(this, observation)
     }
 
-    private fun inspectVisibleNodes(root: AccessibilityNodeInfo): ScreenObservation {
-        // Iterative, bounded walk: no raw content is written anywhere.
-        val work = ArrayDeque<Pair<AccessibilityNodeInfo, Int>>()
-        work.addLast(root to 0)
-        var inspected = 0
+    private data class Pending(
+        val node: AccessibilityNodeInfo,
+        val parentId: Int?,
+        val depth: Int
+    )
+
+    private fun inspectVisibleNodes(root: AccessibilityNodeInfo, now: Long): ScreenObservation {
+        val work = ArrayDeque<Pending>()
+        work.addLast(Pending(root, null, 0))
+        val features = ArrayList<UiNodeFeature>(100)
         var markers = 0
         var adBadges = 0
         var adMetadata = 0
         var textNodes = 0
         var descriptionNodes = 0
 
-        while (work.isNotEmpty() && inspected < MAX_NODES) {
-            val (node, depth) = work.removeFirst()
+        while (work.isNotEmpty() && features.size < MAX_NODES) {
+            val (node, parentId, depth) = work.removeFirst()
             if (!node.isVisibleToUser) continue
-            inspected += 1
 
+            // Read and immediately discard raw text; retain only minimal structural features.
             val text = node.text?.toString()
             val description = node.contentDescription?.toString()
-            if (!text.isNullOrBlank()) textNodes += 1
-            if (!description.isNullOrBlank()) descriptionNodes += 1
-            when (AdLabelObserver.combine(AdLabelObserver.classify(text), AdLabelObserver.classify(description))) {
-                AdLabelObserver.Kind.SPONSORED_BADGE -> markers += 1
-                AdLabelObserver.Kind.AD_BADGE -> adBadges += 1
-                AdLabelObserver.Kind.AD_METADATA_SEGMENT -> adMetadata += 1
+            if (!text.isNullOrBlank()) textNodes++
+            if (!description.isNullOrBlank()) descriptionNodes++
+            val marker = AdLabelObserver.combine(
+                AdLabelObserver.classify(text),
+                AdLabelObserver.classify(description)
+            )
+            when (marker) {
+                AdLabelObserver.Kind.SPONSORED_BADGE -> markers++
+                AdLabelObserver.Kind.AD_BADGE -> adBadges++
+                AdLabelObserver.Kind.AD_METADATA_SEGMENT -> adMetadata++
                 AdLabelObserver.Kind.NONE -> Unit
             }
 
+            val rect = Rect()
+            node.getBoundsInScreen(rect)
+            val id = features.size
+            features.add(
+                UiNodeFeature(
+                    id = id,
+                    parentId = parentId,
+                    depth = depth,
+                    rect = ScreenRect(rect.left, rect.top, rect.right, rect.bottom),
+                    marker = marker,
+                    hasOtherReadableLabel = marker == AdLabelObserver.Kind.NONE &&
+                        (!text.isNullOrBlank() || !description.isNullOrBlank()),
+                    selectedSurfaceHint = if (node.isSelected) {
+                        val a = SurfaceHintResolver.selectedTabHint(text, true)
+                        if (a != com.abdulrahmanalsaeed.feedveil.detection.SurfaceHint.UNKNOWN) a
+                        else SurfaceHintResolver.selectedTabHint(description, true)
+                    } else com.abdulrahmanalsaeed.feedveil.detection.SurfaceHint.UNKNOWN
+                )
+            )
             if (depth < MAX_DEPTH) {
                 for (i in 0 until minOf(node.childCount, MAX_CHILDREN_PER_NODE)) {
-                    node.getChild(i)?.let { work.addLast(it to depth + 1) }
+                    node.getChild(i)?.let { work.addLast(Pending(it, id, depth + 1)) }
                 }
             }
         }
-        // The screen labels/children are not retained, logged, uploaded, or stored.
+
+        val rootRect = features.firstOrNull()?.rect ?: ScreenRect(0, 0, 0, 0)
+        val analysis = resolver.analyze(features, rootRect)
+        val dedupe = deduper.observe(analysis, now)
+
         return ScreenObservation(
-            nodeCount = inspected,
+            nodeCount = features.size,
             exactMarkerCount = markers,
             adBadgeCount = adBadges,
             adMetadataCount = adMetadata,
             textNodeCount = textNodes,
-            descriptionNodeCount = descriptionNodes
+            descriptionNodeCount = descriptionNodes,
+            provisionalContainers = analysis.provisionalCount,
+            unresolvedMarkers = analysis.unresolvedMarkerNodes,
+            placementClusters = dedupe.newPlacementClusters,
+            repeatedPlacements = dedupe.repeatsSuppressed,
+            surfaceHint = analysis.surfaceHint
         )
     }
 
     override fun onInterrupt() {
-        // Nothing to cancel: there are no gestures, overlays or background tasks in Phase 0.
+        deduper.clear()
+    }
+
+    override fun onDestroy() {
+        deduper.clear()
+        super.onDestroy()
     }
 
     companion object {

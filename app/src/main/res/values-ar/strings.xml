@@ -3,8 +3,8 @@
     <string name="app_name">FeedVeil</string>
     <string name="service_name">فحص FeedVeil للقراءة فقط</string>
     <string name="accessibility_description">اختبار جدوى للقراءة فقط: يفحص علامات الواجهة داخل فيسبوك الأصلي بعد موافقتك، بدون ضغط أو تمرير أو تصوير أو حفظ نصوص المنشورات.</string>
-    <string name="title">FeedVeil · المرحلة 0</string>
-    <string name="subtitle">اختبار Accessibility لفيسبوك — قراءة فقط</string>
+    <string name="title">FeedVeil · المرحلة 1 التجريبية</string>
+    <string name="subtitle">فحص بنية المنشورات — قراءة فقط</string>
     <string name="warning">نسخة قراءة فقط: بتفحص علامات Sponsored و ممول و Ad و • Ad؛ الأرقام ملاحظات متكررة ومش عدد الإعلانات الفريدة. مفيش تخطي أو إخفاء تلقائي.</string>
     <string name="permission_notice">صلاحية Accessibility تقدر تقنيًا تقرأ محتوى الشاشة وتتفاعل مع التطبيقات. في المرحلة دي FeedVeil بيفحص أقل قدر من علامات الواجهة داخل تطبيق فيسبوك الأصلي فقط. مش بيحفظ محتوى المنشورات أو الأسماء أو كلمات السر أو صور الشاشة، ومش بيرسل بيانات لأي مكان. تقدر توقف الفحص أو تلغي الصلاحية في أي وقت.</string>
     <string name="permission_title">اقرأ قبل تشغيل صلاحية Accessibility</string>
@@ -33,4 +33,11 @@
     <string name="no_scans">مفيش فحوصات لسه</string>
     <string name="privacy_footer">بنحفظ العدادات المجمعة وإعدادات الموافقة والإيقاف محليًا فقط، من غير تخزين محتوى فيسبوك. التطبيق مش تابع لشركة Meta.</string>
     <string name="testing_hint">للتجربة: وافق على الصلاحية وافتح تطبيق فيسبوك الأصلي ومرّر بنفسك. ارجع هنا واضغط تحديث الأرقام، وسجّل ملاحظاتك يدويًا باستخدام نموذج Phase 0.</string>
+    <string name="phase1_heading">Phase 1 — اختبار ربط العلامة بالمنشور</string>
+    <string name="phase1_note">دي حاويات محتملة فقط مش إعلانات مؤكدة. الأرقام ملاحظات متكررة، وتجميع المواضع مش عدد الإعلانات الفريدة. لا يوجد تخطي تلقائي.</string>
+    <string name="phase1_provisional">ملاحظات لعلامة داخل حاوية محتملة: %1$d</string>
+    <string name="phase1_unresolved">علامات بدون حاوية موثوقة مبدئيًا: %1$d</string>
+    <string name="phase1_clusters">تجمعات مواضع حديثة (تقدير): %1$d</string>
+    <string name="phase1_repeated">ملاحظات متكررة تم دمجها: %1$d</string>
+    <string name="phase1_surface">تلميح الشاشة: Feed %1$d / Reels %2$d / غير معروف %3$d</string>
 </resources>
