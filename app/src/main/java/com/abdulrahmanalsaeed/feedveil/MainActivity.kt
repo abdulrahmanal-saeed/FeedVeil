@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.abdulrahmanalsaeed.feedveil.probe.LocalProbeStore
+import com.abdulrahmanalsaeed.feedveil.probe.ManualTestMode
 import com.abdulrahmanalsaeed.feedveil.probe.ProbeSnapshot
 import com.abdulrahmanalsaeed.feedveil.service.FacebookProbeService
 import java.text.DateFormat
@@ -80,6 +81,10 @@ class MainActivity : ComponentActivity() {
                         onReset = {
                             LocalProbeStore.resetCounters(this)
                             refreshCounter++
+                        },
+                        onBeginTest = { mode ->
+                            LocalProbeStore.beginManualTest(this, mode)
+                            refreshCounter++
                         }
                     )
                 }
@@ -111,7 +116,8 @@ private fun Phase0Screen(
     onSettings: () -> Unit,
     onPauseResume: () -> Unit,
     onRefresh: () -> Unit,
-    onReset: () -> Unit
+    onReset: () -> Unit,
+    onBeginTest: (ManualTestMode) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -164,6 +170,41 @@ private fun Phase0Screen(
             }
         }
 
+        HorizontalDivider()
+        Text(stringResource(R.string.manual_test_title), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.manual_test_explanation), style = MaterialTheme.typography.bodySmall)
+        Text(
+            stringResource(
+                when (snapshot.manualTestMode) {
+                    ManualTestMode.FEED -> R.string.manual_selected_feed
+                    ManualTestMode.REELS -> R.string.manual_selected_reels
+                    ManualTestMode.UNSPECIFIED -> R.string.manual_selected_unspecified
+                }
+            )
+        )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (snapshot.manualTestMode == ManualTestMode.FEED) {
+                Button(onClick = { onBeginTest(ManualTestMode.FEED) }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.manual_feed))
+                }
+            } else {
+                OutlinedButton(onClick = { onBeginTest(ManualTestMode.FEED) }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.manual_feed))
+                }
+            }
+            if (snapshot.manualTestMode == ManualTestMode.REELS) {
+                Button(onClick = { onBeginTest(ManualTestMode.REELS) }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.manual_reels))
+                }
+            } else {
+                OutlinedButton(onClick = { onBeginTest(ManualTestMode.REELS) }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.manual_reels))
+                }
+            }
+        }
+        OutlinedButton(onClick = { onBeginTest(ManualTestMode.UNSPECIFIED) }, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.manual_unspecified))
+        }
         HorizontalDivider()
         Text(stringResource(R.string.scans, snapshot.completedScans))
         Text(stringResource(R.string.markers, snapshot.markerObservations))

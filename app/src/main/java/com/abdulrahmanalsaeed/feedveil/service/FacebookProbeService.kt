@@ -22,6 +22,7 @@ import com.abdulrahmanalsaeed.feedveil.probe.ScreenObservation
  */
 class FacebookProbeService : AccessibilityService() {
     private var lastScannedElapsedMs = 0L
+    private var lastSessionRevision: Long? = null
     private val resolver = FeedContainerResolver()
     private val deduper = RecentCandidateDeduper()
 
@@ -38,6 +39,12 @@ class FacebookProbeService : AccessibilityService() {
 
         val root = rootInActiveWindow ?: return
         if (!ProbeScope.isTargetPackage(root.packageName?.toString())) return
+
+        val revision = LocalProbeStore.currentSessionRevision(this)
+        if (lastSessionRevision != revision) {
+            deduper.clear()
+            lastSessionRevision = revision
+        }
 
         val now = SystemClock.elapsedRealtime()
         if (now - lastScannedElapsedMs < MIN_SCAN_INTERVAL_MS) return

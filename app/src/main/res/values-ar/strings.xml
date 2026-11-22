@@ -33,6 +33,14 @@
     <string name="no_scans">مفيش فحوصات لسه</string>
     <string name="privacy_footer">بنحفظ العدادات المجمعة وإعدادات الموافقة والإيقاف محليًا فقط، من غير تخزين محتوى فيسبوك. التطبيق مش تابع لشركة Meta.</string>
     <string name="testing_hint">للتجربة: وافق على الصلاحية وافتح تطبيق فيسبوك الأصلي ومرّر بنفسك. ارجع هنا واضغط تحديث الأرقام، وسجّل ملاحظاتك يدويًا باستخدام نموذج Phase 0.</string>
+    <string name="manual_test_title">جلسة اختبار يدوية</string>
+    <string name="manual_test_explanation">اختار Feed أو Reels قبل ما تفتح فيسبوك. كل اختيار بيبدأ عدادات جديدة. ده اختيارك إنت، مش اكتشاف تلقائي لنوع الشاشة.</string>
+    <string name="manual_selected_feed">الجلسة الحالية: Feed (اختيار يدوي)</string>
+    <string name="manual_selected_reels">الجلسة الحالية: Reels (اختيار يدوي)</string>
+    <string name="manual_selected_unspecified">الجلسة الحالية: غير محددة</string>
+    <string name="manual_feed">اختبار Feed</string>
+    <string name="manual_reels">اختبار Reels</string>
+    <string name="manual_unspecified">إلغاء التصنيف اليدوي وتصفير العدادات</string>
     <string name="phase1_heading">Phase 1 — اختبار ربط العلامة بالمنشور</string>
     <string name="phase1_note">دي حاويات محتملة فقط مش إعلانات مؤكدة. الأرقام ملاحظات متكررة، وتجميع المواضع مش عدد الإعلانات الفريدة. لا يوجد تخطي تلقائي.</string>
     <string name="phase1_provisional">ملاحظات لعلامة داخل حاوية محتملة: %1$d</string>

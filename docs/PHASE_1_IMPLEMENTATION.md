@@ -38,3 +38,15 @@ Phase 0 on the owner's Android 16 device saw 1,176 Facebook screen scans, 28 exa
 - Tree geometry can be imprecise; scrolling can reuse item containers.
 - Need a manually labeled evaluation set of normal posts and ads to estimate precision, recall, false positives, unknown rate and separate Feed versus Reels compatibility. No target has been achieved yet.
 - To complete Phase 1, review real-device results, improve boundary strategy carefully, and run test-gate methodology in TEST_PLAN.md.
+
+
+## Real device report and manual-session follow-up — 2026-11-22
+Owner screenshot for original Phase 1 preview: 681 scans, 6 exact Ad observations, 14 • Ad metadata observations, 18 provisional container observations, 1 unresolved marker, 12 approximate placement clusters, 6 repeats suppressed. **Feed=0, Reels=0, Unknown=681** — selected-tab-only screen classification failed on this device. These are repeatable observations, NOT confirmed distinct advertisements.
+
+The follow-up adds a **user-selected test session label** (Feed / Reels / Unspecified). Choosing a session resets aggregate counters and invalidates the in-memory placement deduper at the next scan. It never claims to infer the current Facebook screen. The user must remain in the selected surface when sampling. Automatic selected-tab hints remain separate and may remain UNKNOWN. This supports cleaner Feed-only and Reels-only reports without collecting any Facebook text.
+
+### New manual procedure
+1. Open FeedVeil and tap **Start Feed test** (clears counters). Remain in Facebook Home Feed while manually browsing ads and normal posts. Return to capture all numeric counters.
+2. Tap **Start Reels test** (new counters), browse Reels only, return to capture numbers.
+3. The auto selected-tab hint may still read UNKNOWN. The *manual session label* is only user-provided context and never an automation trigger.
+4. Check pause/revoke/other-app boundaries. Report counts of visually ordinary and sponsored posts separately for each session. Counts remain provisional until per-post false-positive/negative validation.

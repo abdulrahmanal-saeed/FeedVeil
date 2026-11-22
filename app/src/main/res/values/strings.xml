@@ -33,6 +33,14 @@
     <string name="no_scans">No scans yet</string>
     <string name="privacy_footer">Only aggregated counters and your local consent/pause settings are stored. No Facebook content is retained. Not affiliated with Meta.</string>
     <string name="testing_hint">To test, grant access, open the original Facebook app, scroll manually, return here and tap Refresh. Record your observations manually using the Phase 0 test sheet.</string>
+    <string name="manual_test_title">Manual test session</string>
+    <string name="manual_test_explanation">Choose Feed or Reels BEFORE opening Facebook. Each selection starts a fresh counter session. This is YOUR test label, not automatic screen recognition.</string>
+    <string name="manual_selected_feed">Current manual session: Feed (user selected)</string>
+    <string name="manual_selected_reels">Current manual session: Reels (user selected)</string>
+    <string name="manual_selected_unspecified">Current manual session: Unspecified</string>
+    <string name="manual_feed">Start Feed test</string>
+    <string name="manual_reels">Start Reels test</string>
+    <string name="manual_unspecified">Clear session label &amp; reset counters</string>
     <string name="phase1_heading">Phase 1 — Candidate post association</string>
     <string name="phase1_note">Only provisional containers, not verified ads. Placement clusters are not unique ads. No automatic actions.</string>
     <string name="phase1_provisional">Provisional post-container observations: %1$d</string>

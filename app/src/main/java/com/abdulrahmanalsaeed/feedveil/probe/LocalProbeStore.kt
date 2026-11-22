@@ -27,12 +27,24 @@ object LocalProbeStore {
     private const val FEED_SCANS = "phase1_feed_hint_scans"
     private const val REELS_SCANS = "phase1_reels_hint_scans"
     private const val UNKNOWN_SCANS = "phase1_unknown_hint_scans"
+    private const val MANUAL_TEST_MODE = "phase1_manual_test_mode"
+    private const val SESSION_REVISION = "phase1_session_revision"
 
     private fun prefs(context: Context) =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
     fun isConsented(context: Context) = prefs(context).getBoolean(CONSENT, false)
     fun isActive(context: Context) = prefs(context).getBoolean(ACTIVE, false)
+
+    fun currentSessionRevision(context: Context) = prefs(context).getLong(SESSION_REVISION, 0L)
+
+    /** Selection is supplied by the user, not inferred from Facebook. Clears old counters. */
+    @Synchronized
+    fun beginManualTest(context: Context, mode: ManualTestMode) {
+        val p = prefs(context)
+        p.edit().putString(MANUAL_TEST_MODE, mode.name).commit()
+        resetCounters(context)
+    }
 
     @Synchronized
     fun grantReadOnlyConsent(context: Context) {
@@ -101,6 +113,7 @@ object LocalProbeStore {
             .remove(FEED_SCANS)
             .remove(REELS_SCANS)
             .remove(UNKNOWN_SCANS)
+            .putLong(SESSION_REVISION, prefs(context).getLong(SESSION_REVISION, 0L) + 1L)
             .apply()
     }
 
@@ -109,6 +122,7 @@ object LocalProbeStore {
         return ProbeSnapshot(
             consented = p.getBoolean(CONSENT, false),
             active = p.getBoolean(ACTIVE, false),
+            manualTestMode = ManualTestMode.fromStored(p.getString(MANUAL_TEST_MODE, null)),
             eligibleEvents = p.getLong(EVENTS, 0L),
             completedScans = p.getLong(SCANS, 0L),
             markerObservations = p.getLong(LABELS, 0L),
