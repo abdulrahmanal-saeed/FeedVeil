@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - phase-1/detection
+      - phase-3/experimental-autoskip
     paths:
       - 'app/**'
       - 'build.gradle.kts'
@@ -115,6 +116,15 @@ jobs:
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release.apk dist/FeedVeil.apk
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs dist/FeedVeil.apk
+          # Same permanent certificate shown by Obtainium for installed v0.1.4.
+          # Never publish an APK with a different signing identity under the same package ID.
+          CERT_SHA256=$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs dist/FeedVeil.apk | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | tr -d '[:space:]:' | tr '[:upper:]' '[:lower:]')
+          EXPECTED_SHA256="0baf297c85f03d91a367415342b6d7aad75b48d7a83cfd34fe0ee661ff8339ee"
+          if [[ "$CERT_SHA256" != "$EXPECTED_SHA256" ]]; then
+            echo "::error::APK signing certificate differs from installed Obtainium version v0.1.4; refusing publication."
+            exit 1
+          fi
+          echo "Release certificate matches previously installed Obtainium version."
           (cd dist && sha256sum FeedVeil.apk > FeedVeil.apk.sha256)
           cat > dist/RELEASE_NOTES.md <<EOF
           FeedVeil development preview v${FEEDVEIL_RELEASE_VERSION}
@@ -127,6 +137,12 @@ jobs:
           Do not enable automatic ad actions without applicable test gates.
           The APK is signed with the owner's permanent development signing identity.
           EOF
+          if [[ "$GITHUB_REF_NAME" == "phase-3/experimental-autoskip" ]]; then
+            echo "" >> dist/RELEASE_NOTES.md
+            echo "Experimental Auto Skip trial (OFF by default): up to 3 swipes after explicit in-app consent." >> dist/RELEASE_NOTES.md
+            echo "Risk: normal posts may be skipped. Floating STOP and approximate Back do not guarantee restoration." >> dist/RELEASE_NOTES.md
+            echo "Not a validated ad classifier, not a production-ready release. Do not use unattended." >> dist/RELEASE_NOTES.md
+          fi
 
       - name: Publish one APK in GitHub development prerelease
         shell: bash
