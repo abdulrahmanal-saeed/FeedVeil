@@ -1,24 +1,21 @@
 package com.abdulrahmanalsaeed.feedveil.autoskip
 
 import android.content.Context
-import android.os.SystemClock
 import com.abdulrahmanalsaeed.feedveil.probe.LocalProbeStore
 import com.abdulrahmanalsaeed.feedveil.probe.ManualTestMode
 
-/** Opt-in experiment; only aggregate numbers persist. No post media or text is saved. */
+/** Opt-in session with no fixed count/time cap; only aggregate numbers persist. */
 object LocalAutoTrial {
     private const val FILE = "phase3_autoskip"
     private const val ARMED = "armed"
     private const val MODE = "mode"
-    private const val START = "started_elapsed"
     private const val ATTEMPTS = "attempts"
     private const val COMPLETE = "completed"
     private const val FAILED = "failed"
     private const val BACKS = "approximate_back"
     private const val MANUAL_ATTEMPTS = "manual_attempts"
     private const val REASON = "last_reason"
-    const val MAX_SKIPS = 3
-    private const val SESSION_MS = 5 * 60_000L
+
 
     data class State(
         val armed: Boolean,
@@ -34,11 +31,10 @@ object LocalAutoTrial {
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
     @Synchronized fun arm(context: Context, mode: ManualTestMode): Boolean {
-        if (mode == ManualTestMode.UNSPECIFIED ||
+        if (mode != ManualTestMode.GENERAL ||
             !LocalProbeStore.isConsented(context) || !LocalProbeStore.isActive(context)) return false
         prefs(context).edit()
             .putBoolean(ARMED, true).putString(MODE, mode.name)
-            .putLong(START, SystemClock.elapsedRealtime())
             .putInt(ATTEMPTS, 0).putInt(COMPLETE, 0)
             .putInt(FAILED, 0).putInt(BACKS, 0)
             .putInt(MANUAL_ATTEMPTS, 0).putString(REASON, "WAITING").commit()
@@ -65,14 +61,9 @@ object LocalAutoTrial {
 
     @Synchronized fun canAct(context: Context): Boolean {
         val state = state(context)
-        val start = prefs(context).getLong(START, 0)
-        val now = SystemClock.elapsedRealtime()
         if (!state.armed) return false
         if (!LocalProbeStore.isConsented(context) || !LocalProbeStore.isActive(context) ||
-            LocalProbeStore.snapshot(context).manualTestMode != state.mode ||
-            state.mode == ManualTestMode.UNSPECIFIED ||
-            state.completed >= MAX_SKIPS || state.attempts >= MAX_SKIPS ||
-            now < start || now - start > SESSION_MS
+            state.mode != ManualTestMode.GENERAL
         ) {
             disarm(context)
             return false
@@ -95,7 +86,7 @@ object LocalAutoTrial {
     @Synchronized fun completed(context: Context) {
         val p = prefs(context)
         val count = p.getInt(COMPLETE, 0) + 1
-        p.edit().putInt(COMPLETE, count).putBoolean(ARMED, count < MAX_SKIPS).commit()
+        p.edit().putInt(COMPLETE, count).commit()
     }
 
     @Synchronized fun failed(context: Context) {

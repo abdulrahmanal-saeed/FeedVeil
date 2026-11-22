@@ -8,10 +8,9 @@ import com.abdulrahmanalsaeed.feedveil.probe.AdLabelObserver
 import com.abdulrahmanalsaeed.feedveil.probe.ManualTestMode
 
 /**
- * Opt-in 3-gesture experiment ONLY. No candidate is a verified ad. Never allow
- * a label by itself to authorize an automatic action.
- *
- * lastReason contains a SYMBOLIC code, never Facebook user text.
+ * User-armed, STOP-controlled experiment with no lifetime number-of-skips cap.
+ * A provisional candidate remains unverified; no click/hide actions are performed.
+ * GENERAL uses only narrow, previously observed marker-type hints; otherwise fail closed.
  */
 class AutoSkipPolicy {
     enum class Reason {
@@ -23,9 +22,12 @@ class AutoSkipPolicy {
 
     var lastReason: Reason = Reason.WAITING
         private set
+    var suggestedSwipeMode: ManualTestMode = ManualTestMode.UNSPECIFIED
+        private set
 
     private var pendingRect: ScreenRect? = null
     private var pendingMarker: AdLabelObserver.Kind? = null
+    private var pendingSwipeMode: ManualTestMode = ManualTestMode.UNSPECIFIED
     private var firstObservedMs = 0L
     private var cooldownUntilMs = 0L
     private var needsEmptyFrame = false
@@ -35,11 +37,12 @@ class AutoSkipPolicy {
         cooldownUntilMs = 0L
         needsEmptyFrame = false
         lastReason = Reason.WAITING
+        suggestedSwipeMode = ManualTestMode.UNSPECIFIED
     }
 
     fun afterCompletedSkip(nowMs: Long) {
         forgetCandidate()
-        needsEmptyFrame = true
+        needsEmptyFrame = true // don't repeatedly skip the same still-visible item
         cooldownUntilMs = nowMs + COOLDOWN_MS
         lastReason = Reason.COOLDOWN
     }
@@ -61,33 +64,87 @@ class AutoSkipPolicy {
         if (scan.candidates.size != 1) return refuse(Reason.MULTIPLE_CANDIDATES)
 
         val candidate = scan.candidates.single()
-        if (candidate.confidence != CandidateConfidence.PROVISIONAL ||
-            !markerAllowed(candidate.marker, mode)
-        ) return refuse(Reason.BAD_LABEL_FOR_MODE)
+        if (candidate.confidence != CandidateConfidence.PROVISIONAL)
+            return refuse(Reason.NO_BOUNDARY)
+
+        val swipeMode = resolveSwipeMode(candidate.marker, mode, scan.surfaceHint)
+        if (swipeMode == ManualTestMode.UNSPECIFIED)
+            return refuse(Reason.BAD_LABEL_FOR_MODE)
+
         val r = candidate.rect
-        if (r == null || !safePlacement(r, viewport, mode)) return refuse(Reason.BOUNDS_REJECTED)
+        if (r == null || !safePlacement(r, viewport, swipeMode))
+            return refuse(Reason.BOUNDS_REJECTED)
         if (needsEmptyFrame) return refuse(Reason.AWAIT_DIFFERENT_ITEM)
 
-        if (pendingMarker == candidate.marker && pendingRect?.nearSamePlacement(r) == true) {
+        if (pendingMarker == candidate.marker && pendingSwipeMode == swipeMode &&
+            pendingRect?.nearSamePlacement(r) == true
+        ) {
             val gap = nowMs - firstObservedMs
             if (gap in STABLE_MS..MAX_STABLE_GAP_MS) {
                 forgetCandidate()
+                suggestedSwipeMode = swipeMode
                 lastReason = Reason.READY
                 return true
             }
-            if (gap > MAX_STABLE_GAP_MS) {
-                firstObservedMs = nowMs
-                pendingRect = r
-                pendingMarker = candidate.marker
-            }
+            if (gap > MAX_STABLE_GAP_MS) firstObservedMs = nowMs
             lastReason = Reason.WAIT_STABLE
             return false
         }
         firstObservedMs = nowMs
         pendingRect = r
         pendingMarker = candidate.marker
+        pendingSwipeMode = swipeMode
         lastReason = Reason.WAIT_STABLE
         return false
+    }
+
+    /** A scroll event AFTER the last completed action can indicate new content. */
+    fun observedPostSkipScroll() {
+        needsEmptyFrame = false
+        forgetCandidate()
+        lastReason = Reason.WAIT_STABLE
+    }
+
+    private fun resolveSwipeMode(
+        marker: AdLabelObserver.Kind,
+        mode: ManualTestMode,
+        hint: SurfaceHint
+    ): ManualTestMode {
+        if (mode == ManualTestMode.FEED || mode == ManualTestMode.REELS) {
+            if (mode == ManualTestMode.FEED && hint == SurfaceHint.REELS) return ManualTestMode.UNSPECIFIED
+            if (mode == ManualTestMode.REELS && hint == SurfaceHint.FEED) return ManualTestMode.UNSPECIFIED
+            return when (mode) {
+                ManualTestMode.FEED ->
+                    if (marker == AdLabelObserver.Kind.AD_METADATA_SEGMENT ||
+                        marker == AdLabelObserver.Kind.SPONSORED_BADGE) ManualTestMode.FEED
+                    else ManualTestMode.UNSPECIFIED
+                ManualTestMode.REELS ->
+                    if (marker == AdLabelObserver.Kind.AD_BADGE ||
+                        marker == AdLabelObserver.Kind.SPONSORED_BADGE) ManualTestMode.REELS
+                    else ManualTestMode.UNSPECIFIED
+                else -> ManualTestMode.UNSPECIFIED
+            }
+        }
+        if (mode != ManualTestMode.GENERAL) return ManualTestMode.UNSPECIFIED
+
+        // Surface hints were UNKNOWN in earlier owner tests; a marker is only a
+        // narrow inference, not proof of Feed vs Reels screen identity.
+        return when (hint) {
+            SurfaceHint.FEED -> when (marker) {
+                AdLabelObserver.Kind.NONE -> ManualTestMode.UNSPECIFIED
+                else -> ManualTestMode.FEED
+            }
+            SurfaceHint.REELS -> when (marker) {
+                AdLabelObserver.Kind.NONE -> ManualTestMode.UNSPECIFIED
+                else -> ManualTestMode.REELS
+            }
+            SurfaceHint.UNKNOWN -> when (marker) {
+                AdLabelObserver.Kind.AD_METADATA_SEGMENT -> ManualTestMode.FEED
+                AdLabelObserver.Kind.AD_BADGE -> ManualTestMode.REELS
+                // Generic Sponsored badge with no reliable surface: do not guess.
+                else -> ManualTestMode.UNSPECIFIED
+            }
+        }
     }
 
     private fun refuse(reason: Reason): Boolean {
@@ -99,17 +156,9 @@ class AutoSkipPolicy {
     private fun forgetCandidate() {
         pendingRect = null
         pendingMarker = null
+        pendingSwipeMode = ManualTestMode.UNSPECIFIED
         firstObservedMs = 0L
     }
-
-    private fun markerAllowed(kind: AdLabelObserver.Kind, mode: ManualTestMode): Boolean =
-        when (mode) {
-            ManualTestMode.FEED -> kind == AdLabelObserver.Kind.AD_METADATA_SEGMENT ||
-                kind == AdLabelObserver.Kind.SPONSORED_BADGE
-            ManualTestMode.REELS -> kind == AdLabelObserver.Kind.AD_BADGE ||
-                kind == AdLabelObserver.Kind.SPONSORED_BADGE
-            ManualTestMode.UNSPECIFIED -> false
-        }
 
     private fun safePlacement(r: ScreenRect, viewport: ScreenRect, mode: ManualTestMode): Boolean {
         if (r.area <= 0L || viewport.area <= 0L) return false

@@ -33,10 +33,10 @@ import com.abdulrahmanalsaeed.feedveil.probe.ProbeScope
 import com.abdulrahmanalsaeed.feedveil.probe.ScreenObservation
 
 /**
- * Experimental supervised 3-skip trial, entirely off until explicit in-app consent.
- * Does NOT identify unique advertisements; provisional association may be wrong.
- * At most 3 gestures per arm, manual Feed/Reels test mode, 2 stable observations,
- * 15 sec cooldown, approximately reversible swipe, and visible Stop/Back overlay.
+ * Experimental general Feed/Reels automatic ad skipping, OFF by default.
+ * User must separately arm every session. No fixed ad count or time cap.
+ * Strict provisional candidates, minimum 15s cooldown, STOP/Back overlay.
+ * Only Facebook UI content is read; other apps' event package metadata supports cleanup.
  */
 class FacebookProbeService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
@@ -106,6 +106,8 @@ class FacebookProbeService : AccessibilityService() {
         if (event.eventType == AccessibilityEvent.TYPE_VIEW_SCROLLED) {
             lastScrollElapsedMs = now
             cancelCheck()
+            if (!gestureInFlight && now > lastGestureElapsedMs + 400L &&
+                lastGestureElapsedMs > 0L) policy.observedPostSkipScroll()
         }
         if (now - lastScannedElapsedMs < SCAN_INTERVAL_MS) return
         lastScannedElapsedMs = now
@@ -129,7 +131,7 @@ class FacebookProbeService : AccessibilityService() {
                 val eligible = policy.maySkip(frame.analysis, mode, frame.viewport, now)
                 reportReason(policy.lastReason.name)
                 if (eligible) {
-                    performForwardSkip(mode)
+                    performForwardSkip(policy.suggestedSwipeMode)
                 } else if (frame.analysis.candidates.isNotEmpty()) {
                     scheduleStableRecheck()
                 }
@@ -241,7 +243,7 @@ class FacebookProbeService : AccessibilityService() {
             reportReason(policy.lastReason.name)
             updateControls()
             if (eligible) {
-                performForwardSkip(mode)
+                performForwardSkip(policy.suggestedSwipeMode)
             } else if (frame.analysis.candidates.isNotEmpty()) {
                 scheduleStableRecheck()
             }
@@ -278,15 +280,8 @@ class FacebookProbeService : AccessibilityService() {
                 undoEligible = true
                 previousMode = mode
                 updateControls()
-                // After the third skip keep Back available briefly, then clean up.
-                if (!LocalAutoTrial.canAct(this)) {
-                    handler.postDelayed({
-                        if (!LocalAutoTrial.state(this).armed && !gestureInFlight) {
-                            undoEligible = false
-                            removeOverlay()
-                        }
-                    }, UNDO_WINDOW_MS)
-                }
+                // Unlimited until STOP / app switch / revoke; keep Back available.
+                // After every completed swipe the next one still requires new stable evidence.
             },
             onFailure = {
                 gestureInFlight = false
@@ -391,9 +386,16 @@ class FacebookProbeService : AccessibilityService() {
                 text = getString(R.string.trial_manual_button)
                 contentDescription = getString(R.string.trial_manual_button)
                 setOnClickListener {
-                    // Direct user interaction bypasses candidate classification, but
-                    // never bypasses explicit arming, 3-attempt cap, cooldown, or foreground.
-                    performForwardSkip(LocalAutoTrial.state(this@FacebookProbeService).mode, manual = true)
+                    // User-requested one-swipe test bypasses candidate classification only.
+                    // It still requires arming, cooldown and Facebook foreground.
+                    val chosen = LocalProbeStore.snapshot(this@FacebookProbeService).manualTestMode
+                    val surface = when (chosen) {
+                        ManualTestMode.FEED, ManualTestMode.REELS -> chosen
+                        else -> policy.suggestedSwipeMode.takeIf {
+                            it == ManualTestMode.FEED || it == ManualTestMode.REELS
+                        } ?: ManualTestMode.FEED
+                    }
+                    performForwardSkip(surface, manual = true)
                 }
             }
             val stop = Button(this).apply {
@@ -432,7 +434,7 @@ class FacebookProbeService : AccessibilityService() {
 
     private fun updateControls() {
         val s = LocalAutoTrial.state(this)
-        overlayLabel?.text = getString(R.string.trial_overlay_count, s.completed, LocalAutoTrial.MAX_SKIPS) +
+        overlayLabel?.text = getString(R.string.trial_overlay_count, s.completed) +
             "\n" + getString(R.string.trial_reason_overlay, s.lastReason)
         backButton?.visibility = if (undoEligible) View.VISIBLE else View.GONE
         manualButton?.isEnabled = !gestureInFlight && s.armed &&
@@ -486,7 +488,6 @@ class FacebookProbeService : AccessibilityService() {
         private const val SCAN_INTERVAL_MS = 750L
         private const val STABLE_RECHECK_DELAY_MS = 1750L
         private const val IDLE_AFTER_SCROLL_MS = 1200L
-        private const val UNDO_WINDOW_MS = 30000L
         private const val MAX_NODES = 250
         private const val MAX_DEPTH = 14
         private const val MAX_CHILDREN_PER_NODE = 30

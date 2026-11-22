@@ -7,7 +7,9 @@ package com.abdulrahmanalsaeed.feedveil.probe
 enum class ManualTestMode {
     UNSPECIFIED,
     FEED,
-    REELS;
+    REELS,
+    /** Used by the separately armed Auto Skip, never treated as a real tab detection. */
+    GENERAL;
 
     companion object {
         fun fromStored(value: String?): ManualTestMode =

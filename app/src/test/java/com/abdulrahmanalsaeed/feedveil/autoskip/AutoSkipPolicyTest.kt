@@ -76,4 +76,47 @@ class AutoSkipPolicyTest {
 }
 
 
-/* Additional policy reason tests live below. */
+
+
+class GlobalAutoSkipPolicyTest {
+    private val viewport = ScreenRect(0, 0, 400, 900)
+    private val rect = ScreenRect(0, 250, 400, 700)
+    private fun scan(kind: AdLabelObserver.Kind, hint: SurfaceHint = SurfaceHint.UNKNOWN) =
+        CandidateScan(hint, listOf(AdCandidate(1, kind, rect,
+            CandidateConfidence.PROVISIONAL, hint)), 0)
+
+    @Test fun generalFeedAutoSelectsFeedSwipeStyle() {
+        val policy = AutoSkipPolicy()
+        val c = scan(AdLabelObserver.Kind.AD_METADATA_SEGMENT)
+        assertFalse(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 1000))
+        assertTrue(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 2400))
+        assertEquals(ManualTestMode.FEED, policy.suggestedSwipeMode)
+    }
+
+    @Test fun generalReelsAutoSelectsReelSwipeStyle() {
+        val policy = AutoSkipPolicy()
+        val c = scan(AdLabelObserver.Kind.AD_BADGE)
+        assertFalse(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 1000))
+        assertTrue(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 2400))
+        assertEquals(ManualTestMode.REELS, policy.suggestedSwipeMode)
+    }
+
+    @Test fun genericSponsoredUnknownSurfaceFailsClosed() {
+        val policy = AutoSkipPolicy()
+        val c = scan(AdLabelObserver.Kind.SPONSORED_BADGE)
+        assertFalse(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 1000))
+        assertFalse(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 2600))
+    }
+
+    @Test fun generalModeCanContinueAfterCompletedSwipeWithNewEvidence() {
+        val policy = AutoSkipPolicy()
+        val c = scan(AdLabelObserver.Kind.AD_METADATA_SEGMENT)
+        assertFalse(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 1000))
+        assertTrue(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 2400))
+        policy.afterCompletedSkip(2400)
+        assertFalse(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 17000))
+        policy.observedPostSkipScroll()
+        assertFalse(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 17500))
+        assertTrue(policy.maySkip(c, ManualTestMode.GENERAL, viewport, 19000))
+    }
+}

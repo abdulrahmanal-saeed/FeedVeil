@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
                         },
                         trial = LocalAutoTrial.state(this),
                         onArmTrial = {
-                            if (LocalAutoTrial.arm(this, snapshot.manualTestMode)) refreshCounter++
+                            if (LocalAutoTrial.arm(this, ManualTestMode.GENERAL)) refreshCounter++
                         },
                         onStopTrial = {
                             LocalAutoTrial.disarm(this)
@@ -256,8 +256,7 @@ private fun Phase0Screen(
         } else {
             OutlinedButton(
                 onClick = { showTrialConfirm.value = true },
-                enabled = serviceEnabled && snapshot.consented && snapshot.active &&
-                    snapshot.manualTestMode != ManualTestMode.UNSPECIFIED,
+                enabled = serviceEnabled && snapshot.consented && snapshot.active,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.trial_start))

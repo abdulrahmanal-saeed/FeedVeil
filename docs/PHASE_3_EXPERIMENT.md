@@ -43,3 +43,7 @@ Android's accessibility tree does not provide a reliable browser-like history fo
 - Manually labeled correct vs wrong skips and false positive analysis supplied before considering expanded automation.
 
 **Final always-on Auto Skip remains BLOCKED pending Phase 1 detection metrics and safety review.**
+
+
+## General mode update (2026-11-22)
+User requested removal of the **three-ad / five-minute experiment ceiling**, and one Auto Skip switch for both Feed and Reels. The new opt-in GENERAL mode runs only while armed and the original Facebook app remains in foreground, with persistent overlay STOP and approximate Back. Automatic actions still require a unique provisional ad-container, one of the observed narrow sponsor markers, two stable observations, viewport geometry checks, and a 15-second cooldown. If the accessibility surface type is UNKNOWN, `• Ad` metadata maps to Feed-style gesture; standalone `Ad` maps to Reels-style gesture. This is a heuristic, not true page identification; for generic Sponsored labels without a surface hint, fail closed. The old manual Feed/Reels buttons remain for *diagnostic labels only*, not required for GENERAL Auto Skip. No cap and no timeout do NOT mean unattended browsing is safe; monitor false positives and use STOP. Service restarts/app switching/consent revocation/pausing still disarm.
