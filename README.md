@@ -30,6 +30,10 @@
 | Local statistics | Count validated detections/actions without storing post text | Planned |
 | Kill switch | Pause everything immediately | Required before auto actions |
 
+## الخطة بالعربي
+
+[اقرأ الخطة التنفيذية الكاملة بالعربية](docs/PLAN_AR.md) — تشمل المميزات الأربع، مراحل التطوير، الاختبارات والخصوصية.
+
 ## Documentation index
 
 1. [Product requirements, scope, user experience](docs/PRD.md)
