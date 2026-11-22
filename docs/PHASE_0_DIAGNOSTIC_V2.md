@@ -11,3 +11,19 @@ Retest: install new APK, reset counters, visually hold an Ad post in original Fa
 Interpretation: if new Ad counters increase, Facebook exposes some markers; Phase 1 must link them to the correct post. If text nodes exist but all marker counters stay zero, labels may be absent or exposed in another representation. Any candidate observations can be false positives. Do NOT use these heuristics for automatic scrolling/hiding.
 
 Use issue #2 for redacted numerical reports; do not upload raw Facebook content into the public repository.
+
+## Actual device findings — 2026-11-22
+The owner tested **v0.0.2** in native Facebook with visible ad examples from Feed and Reels and shared the on-device aggregate counters:
+
+| Metric | Value |
+| --- | ---: |
+| Screen scans | 1,176 |
+| Facebook events | 1,176 |
+| Sponsored / ممول observations | 0 |
+| Exact Ad / إعلان badge observations | 28 |
+| • Ad metadata observations | 40 |
+| Nodes inspected (last scan) | 43 |
+| Text nodes (last scan) | 5 |
+| Content description nodes (last scan) | 14 |
+
+**Conclusion:** real device feasibility signal present. At least some textual ad-label candidates are accessible, unlike the old exact-Sponsored-only probe. **Conditional GO** to Phase 1 *research* into reliable ad/post association and separate Feed/Reels surfaces; not yet an auto-action authorization. Exact counts are event observations, **not distinct ad counts**. The last-scan text/node numbers describe one scan only and don't measure all views. Precision, recall and false positives are unknown. Do not merge or release automatic interaction based on this screenshot alone. See [Issue #2](https://github.com/abdulrahmanal-saeed/FeedVeil/issues/2).
