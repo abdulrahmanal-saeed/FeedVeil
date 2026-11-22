@@ -42,7 +42,7 @@
     <string name="manual_reels">Start Reels test</string>
     <string name="manual_unspecified">Clear session label &amp; reset counters</string>
     <string name="trial_heading">General Auto Skip — Feed + Reels (OFF by default)</string>
-    <string name="trial_important">Experimental use only. Feed and Reels manual-test buttons above are optional and don't control Auto Skip. Enable the general mode separately. No fixed skip limit: it runs while Facebook is in use until STOP or leaving the app; 15-second cooldown. Wrong skips are possible. The overlay has Stop, a deliberately tapped swipe test, and approximate Back; exact history cannot be reconstructed. Do not use for unattended browsing.</string>
+    <string name="trial_important">Experimental use only. Feed and Reels manual-test buttons above are optional and do not control Auto Skip. Enable the general mode separately. No fixed skip limit: it runs while Facebook is in use until STOP or leaving the app; 15-second cooldown. Wrong skips are possible. The overlay has Stop, a deliberately tapped swipe test, and approximate Back; exact history cannot be reconstructed. Do not use for unattended browsing.</string>
     <string name="trial_stats">Attempts: %1$d / completed: %2$d / failed: %3$d / approximate backs: %4$d</string>
     <string name="trial_start">Enable Auto Skip — Feed + Reels</string>
     <string name="trial_stop">Stop experimental Auto Skip</string>
