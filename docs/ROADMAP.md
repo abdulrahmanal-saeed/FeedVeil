@@ -1,5 +1,5 @@
 # Phase-based delivery roadmap & implementation backlog
-**Current checkpoint:** Documentation first. No app code has been written. Each phase requires reviewable output and explicit acceptance evidence.
+**Current checkpoint:** Phase 0 Android read-only prototype built and tested on the owner's device; Phase 1 read-only post-boundary preview implemented on a stacked branch, with real-device classification accuracy not yet proven. Every phase needs reviewable evidence before enabling automatic actions.
 
 ## Working rules for every phase
 - Branch per phase: phase-0/probe, phase-1/detection, phase-2/manual-assist, phase-3/auto-skip, phase-4/native-hide, phase-5/mask, phase-6/hardening, phase-7/ui-ux.

@@ -1,10 +1,10 @@
 # FeedVeil
 
-> **Planning stage — no Android application code has been implemented yet.**
+> **Phase 1 developer preview:** Read-only Android APK scaffold and on-device accessibility probes are implemented on development branches. Detection of *actual* unique ads is not verified; all automated actions remain absent.
 
 **FeedVeil** is a proposed, privacy-first Android companion that attempts to **detect and reduce sponsored posts in the original Facebook Android app**, without root, repackaging, reverse engineering Facebook binaries, or a built-in browser.
 
-**Status:** Documentation / feasibility-first project (2026-11-22). All features below are **planned experiments, not confirmed capabilities**.
+**Status:** Phase 0 read-only marker observations were verified on one Android device; Phase 1 experimental post-boundary association is being tested. All intervention features remain planned and OFF.
 
 ## Vision and constraints
 
@@ -48,9 +48,21 @@
 
 **Roadmap:** Phases 0–6 cover feasibility, features and technical hardening. **Phase 7 is dedicated to final UI/UX design**, Arabic/English screens, design system, prototype, Compose implementation and final signed personal APK (after owner review). Earlier phases still include minimal, safe permission and stop interfaces.
 
+## Current code and test reports
+
+- [Phase 0 diagnostic findings](docs/PHASE_0_DIAGNOSTIC_V2.md)
+- [Phase 1 experimental post association and retest instructions](docs/PHASE_1_IMPLEMENTATION.md)
+- [Phase 1 draft PR](https://github.com/abdulrahmanal-saeed/FeedVeil/pull/3) (stacked on Phase 0)
+
+## Automatic Android updates via Obtainium
+
+[Setup guide: GitHub Releases + Obtainium + permanent Android signing](docs/OBTAINIUM_UPDATES.md).
+
+The signed prerelease publisher exists on the Phase 1 branch, but **publication is disabled until the owner configures four GitHub Actions signing secrets**. Unlike transient debug CI APKs, subsequent permanently signed releases can be tracked and updated through Obtainium. No automatic silent installs are promised.
+
 ## Immediate next step
 
-**Phase 0 only:** build a minimal read-only Android accessibility probe; verify whether the Facebook app exposes enough information to reliably distinguish sponsored from ordinary posts on real devices. Do **not** implement auto-skip, menu clicks, or a masking overlay before the feasibility report and test evidence.
+**Phase 1 preview:** Test whether visible `Ad` labels can be associated with a plausible UI post boundary, and verify safety on a real device. These are provisional observations only; **do not implement or enable auto-skip, native Hide Ad or mask** before classification confidence and manual safety gates are met.
 
 ## Development convention
 
