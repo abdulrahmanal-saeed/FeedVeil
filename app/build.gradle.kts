@@ -23,9 +23,9 @@ android {
         applicationId = "com.abdulrahmanalsaeed.feedveil"
         minSdk = 29
         targetSdk = 36
-        versionCode = providers.gradleProperty("feedveilVersionCode").orNull?.toIntOrNull() ?: 3
+        versionCode = providers.gradleProperty("feedveilVersionCode").orNull?.toIntOrNull() ?: 4
         versionName = providers.gradleProperty("feedveilVersionName").orNull
-            ?: "0.1.0-phase1-preview"
+            ?: "0.3.0-experimental-autoskip"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

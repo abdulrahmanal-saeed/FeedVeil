@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
@@ -30,10 +31,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.abdulrahmanalsaeed.feedveil.autoskip.LocalAutoTrial
 import com.abdulrahmanalsaeed.feedveil.probe.LocalProbeStore
 import com.abdulrahmanalsaeed.feedveil.probe.ManualTestMode
 import com.abdulrahmanalsaeed.feedveil.probe.ProbeSnapshot
@@ -69,11 +73,13 @@ class MainActivity : ComponentActivity() {
                             openSystemAccessibilitySettings()
                         },
                         onDecline = {
+                            LocalAutoTrial.disarm(this)
                             LocalProbeStore.revokeInAppConsent(this)
                             refreshCounter++
                         },
                         onSettings = { openSystemAccessibilitySettings() },
                         onPauseResume = {
+                            if (snapshot.active) LocalAutoTrial.disarm(this)
                             LocalProbeStore.setActive(this, !snapshot.active)
                             refreshCounter++
                         },
@@ -83,7 +89,16 @@ class MainActivity : ComponentActivity() {
                             refreshCounter++
                         },
                         onBeginTest = { mode ->
+                            LocalAutoTrial.disarm(this)
                             LocalProbeStore.beginManualTest(this, mode)
+                            refreshCounter++
+                        },
+                        trial = LocalAutoTrial.state(this),
+                        onArmTrial = {
+                            if (LocalAutoTrial.arm(this, ManualTestMode.GENERAL)) refreshCounter++
+                        },
+                        onStopTrial = {
+                            LocalAutoTrial.disarm(this)
                             refreshCounter++
                         }
                     )
@@ -117,8 +132,30 @@ private fun Phase0Screen(
     onPauseResume: () -> Unit,
     onRefresh: () -> Unit,
     onReset: () -> Unit,
-    onBeginTest: (ManualTestMode) -> Unit
+    onBeginTest: (ManualTestMode) -> Unit,
+    trial: LocalAutoTrial.State,
+    onArmTrial: () -> Unit,
+    onStopTrial: () -> Unit
 ) {
+    val showTrialConfirm = remember { mutableStateOf(false) }
+    if (showTrialConfirm.value) {
+        AlertDialog(
+            onDismissRequest = { showTrialConfirm.value = false },
+            title = { Text(stringResource(R.string.trial_dialog_title)) },
+            text = { Text(stringResource(R.string.trial_dialog_body)) },
+            confirmButton = {
+                Button(onClick = {
+                    showTrialConfirm.value = false
+                    onArmTrial()
+                }) { Text(stringResource(R.string.trial_dialog_confirm)) }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showTrialConfirm.value = false }) {
+                    Text(stringResource(R.string.trial_dialog_cancel))
+                }
+            }
+        )
+    }
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(WindowInsets.safeDrawing.asPaddingValues())
@@ -178,7 +215,7 @@ private fun Phase0Screen(
                 when (snapshot.manualTestMode) {
                     ManualTestMode.FEED -> R.string.manual_selected_feed
                     ManualTestMode.REELS -> R.string.manual_selected_reels
-                    ManualTestMode.UNSPECIFIED -> R.string.manual_selected_unspecified
+                    ManualTestMode.UNSPECIFIED, ManualTestMode.GENERAL -> R.string.manual_selected_unspecified
                 }
             )
         )
@@ -204,6 +241,26 @@ private fun Phase0Screen(
         }
         OutlinedButton(onClick = { onBeginTest(ManualTestMode.UNSPECIFIED) }, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.manual_unspecified))
+        }
+        HorizontalDivider()
+        Text(stringResource(R.string.trial_heading), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.trial_important), style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.trial_stats, trial.attempts, trial.completed, trial.failed, trial.approximateBacks))
+        Text(stringResource(R.string.trial_manual_stats, trial.manualAttempts))
+        Text(stringResource(R.string.trial_last_reason, trial.lastReason), style = MaterialTheme.typography.bodySmall)
+        if (trial.armed) {
+            Text(stringResource(R.string.trial_armed_status), color = MaterialTheme.colorScheme.error)
+            Button(onClick = onStopTrial, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.trial_stop))
+            }
+        } else {
+            OutlinedButton(
+                onClick = { showTrialConfirm.value = true },
+                enabled = serviceEnabled && snapshot.consented && snapshot.active,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.trial_start))
+            }
         }
         HorizontalDivider()
         Text(stringResource(R.string.scans, snapshot.completedScans))
