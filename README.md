@@ -54,6 +54,12 @@
 - [Phase 1 experimental post association and retest instructions](docs/PHASE_1_IMPLEMENTATION.md)
 - [Phase 1 draft PR](https://github.com/abdulrahmanal-saeed/FeedVeil/pull/3) (stacked on Phase 0)
 
+## Automatic Android updates via Obtainium
+
+[Setup guide: GitHub Releases + Obtainium + permanent Android signing](docs/OBTAINIUM_UPDATES.md).
+
+The signed prerelease publisher exists on the Phase 1 branch, but **publication is disabled until the owner configures four GitHub Actions signing secrets**. Unlike transient debug CI APKs, subsequent permanently signed releases can be tracked and updated through Obtainium. No automatic silent installs are promised.
+
 ## Immediate next step
 
 **Phase 1 preview:** Test whether visible `Ad` labels can be associated with a plausible UI post boundary, and verify safety on a real device. These are provisional observations only; **do not implement or enable auto-skip, native Hide Ad or mask** before classification confidence and manual safety gates are met.
