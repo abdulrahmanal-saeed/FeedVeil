@@ -4,6 +4,15 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// Obtainium release signing uses a permanent, owner-controlled keystore from CI secrets.
+val releaseKeystorePath = providers.environmentVariable("FEEDVEIL_KEYSTORE_FILE").orNull
+val releaseStorePassword = providers.environmentVariable("FEEDVEIL_KEYSTORE_PASSWORD").orNull
+val releaseKeyAlias = providers.environmentVariable("FEEDVEIL_KEY_ALIAS").orNull
+val releaseKeyPassword = providers.environmentVariable("FEEDVEIL_KEY_PASSWORD").orNull
+val releaseSigningReady = listOf(
+    releaseKeystorePath, releaseStorePassword, releaseKeyAlias, releaseKeyPassword
+).all { !it.isNullOrBlank() }
+
 android {
     namespace = "com.abdulrahmanalsaeed.feedveil"
     compileSdk = 36
@@ -12,14 +21,31 @@ android {
         applicationId = "com.abdulrahmanalsaeed.feedveil"
         minSdk = 29
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.1.0-phase1-preview"
+        versionCode = providers.gradleProperty("feedveilVersionCode").orNull?.toIntOrNull() ?: 3
+        versionName = providers.gradleProperty("feedveilVersionName").orNull
+            ?: "0.1.0-phase1-preview"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (releaseSigningReady) {
+            create("feedveilRelease") {
+                storeFile = file(requireNotNull(releaseKeystorePath))
+                storePassword = requireNotNull(releaseStorePassword)
+                keyAlias = requireNotNull(releaseKeyAlias)
+                keyPassword = requireNotNull(releaseKeyPassword)
+                enableV1Signing = true
+                enableV2Signing = true
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            if (releaseSigningReady) {
+                signingConfig = signingConfigs.getByName("feedveilRelease")
+            }
         }
     }
 
