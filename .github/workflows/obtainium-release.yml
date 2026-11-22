@@ -95,8 +95,8 @@ jobs:
           CODE=$((100000 + GITHUB_RUN_NUMBER))
           VERSION="0.1.${GITHUB_RUN_NUMBER}"
           echo "FEEDVEIL_VERSION_CODE=$CODE" >> "$GITHUB_ENV"
-          echo "FEEDVEIL_VERSION_NAME=${VERSION}-dev" >> "$GITHUB_ENV"
-          echo "FEEDVEIL_RELEASE_TAG=dev-v${VERSION}" >> "$GITHUB_ENV"
+          echo "FEEDVEIL_VERSION_NAME=${VERSION}" >> "$GITHUB_ENV"
+          echo "FEEDVEIL_RELEASE_TAG=v${VERSION}" >> "$GITHUB_ENV"
           echo "FEEDVEIL_RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
 
       - name: Compile, unit-test, lint and build signed release
