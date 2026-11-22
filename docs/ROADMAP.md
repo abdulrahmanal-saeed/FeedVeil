@@ -2,7 +2,7 @@
 **Current checkpoint:** Documentation first. No app code has been written. Each phase requires reviewable output and explicit acceptance evidence.
 
 ## Working rules for every phase
-- Branch per phase: phase-0/probe, phase-1/detection, phase-2/manual-assist, phase-3/auto-skip, phase-4/native-hide, phase-5/mask, phase-6/hardening.
+- Branch per phase: phase-0/probe, phase-1/detection, phase-2/manual-assist, phase-3/auto-skip, phase-4/native-hide, phase-5/mask, phase-6/hardening, phase-7/ui-ux.
 - Open a PR with scope, screenshots **of our own app only**, test commands/results, known limitations, and linked acceptance checklist. No automatic merges.
 - CI failures block merges. On-device Facebook testing is a separate manual gate, not something CI can certify.
 - **Do not start the next phase until the previous gate is met** or the owner explicitly approves a documented reduced scope.
@@ -70,16 +70,30 @@ Zero wrong menu selections in test matrix; otherwise mark unsupported, not silen
 ### Exit gate
 Correct-region masking and zero lingering overlays across lifecycle test matrix. Otherwise leave off.
 
-## Phase 6 — Polishing, compatibility and personal release
+## Phase 6 — Technical hardening, compatibility and release readiness
 ### Tasks
-- P6-001: UX polish, accessibility, dark mode, Arabic/English strings and privacy notice.
-- P6-002: Regression across Android versions, current Facebook releases, RTL, font scale, battery/performance.
-- P6-003: Service crash recovery, compatibility safety switch, manual rules reset.
-- P6-004: Versioned changelog, reproducible build, dependency checks and static analysis.
-- P6-005: Generate signed APK via owner-controlled secret storage, verify signatures, checksums, distribution notes.
-- P6-006: Compile factual feature support table: supported / experimental / unsupported.
+- P6-001: Regression across Android versions and verified Facebook releases, including RTL, large fonts, performance/battery.
+- P6-002: Service crash recovery, rule compatibility safety switch, manual reset, failure handling.
+- P6-003: Static analysis, dependency checks, security/privacy audit, green automated test suite.
+- P6-004: Versioned changelog, reproducible debug builds and verified feature support matrix (supported / experimental / unsupported).
+- P6-005: Prepare APK packaging and owner-controlled signing strategy; **final signed user-facing release is deferred until Phase 7 UI/UX approval**.
 ### Exit gate
-Private APK release with documented limitations, green tests and manual QA approval. No Google Play listing assumed.
+Technical implementation is stable, safety checks pass, all feature flags accurately reflect validation. Core safety/consent UI works; final product visual refinement comes next.
+
+## Phase 7 — UI/UX design system, polished experience and final personal APK
+**Full specification:** [UI/UX Phase 7](UI_UX_PHASE_7.md)
+### Tasks
+- P7-001: UX audit, user journeys, navigation, full screen-state inventory and low-fidelity wireframes.
+- P7-002: Brand direction, original app icon and adaptive splash; component library / Material 3 tokens.
+- P7-003: High-fidelity screens for Dashboard, mode controls, local statistics, permissions, diagnostics, settings, privacy, about and error states.
+- P7-004: Arabic RTL / English LTR, dark/light themes, font scaling and accessible screen-reader interactions.
+- P7-005: Prototypes for permission education, global pause, Auto Skip consent, Hide Ad opt-in and error recovery.
+- P7-006: Design unobtrusive Manual Assist bubble and removable Visual Mask variants, reflecting actual verified technical limitations.
+- P7-007: Implement the approved designs using reusable Jetpack Compose components wired to real state.
+- P7-008: UI/instrumentation tests, TalkBack and contrast review, device usability walkthrough, defect fixes.
+- P7-009: Owner design review and final validation; produce owner-signed APK, changelog and private distribution documentation.
+### Exit gate
+Visual and interaction experience approved in Arabic/English, critical accessibility/safety flows preserved, no misleading blocked-ad claims, tests pass and final APK is signed by owner-controlled keys. No Google Play release assumed.
 
 ## Later research backlog (not committed)
 - Reels, Stories and in-stream ads: independent P0-style feasibility + tests before actions.
