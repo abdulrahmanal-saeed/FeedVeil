@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FeedVeil</string>
+    <string name="service_name">FeedVeil read-only probe</string>
+    <string name="accessibility_description">Read-only feasibility experiment: checks accessibility labels in the original Facebook app when you consent. No taps, scrolling, screen capture or stored post text.</string>
+    <string name="title">FeedVeil · Phase 0</string>
+    <string name="subtitle">Read-only Facebook accessibility probe</string>
+    <string name="warning">Read-only diagnostic build: observes Sponsored, ممول, Ad and • Ad when exposed by Facebook accessibility. Observations can repeat for the same ad. No scrolling, hiding or blocking.</string>
+    <string name="permission_notice">Accessibility can technically read on-screen content and interact with apps. FeedVeil Phase 0 uses it only to inspect minimal visible UI labels in the original Facebook app. It does not save post contents, names, passwords, screenshots, or send data anywhere. You can pause or revoke permission at any time.</string>
+    <string name="permission_title">Read before enabling accessibility</string>
+    <string name="accept">I understand — enable read-only probe</string>
+    <string name="decline">Decline / revoke in-app consent</string>
+    <string name="accessibility_settings">Open Accessibility settings</string>
+    <string name="status_title">Current status</string>
+    <string name="permission_on">Android service: enabled</string>
+    <string name="permission_off">Android service: disabled</string>
+    <string name="probe_on">Read-only probe: active</string>
+    <string name="probe_off">Read-only probe: paused</string>
+    <string name="probe_not_consented">Read-only probe: no in-app consent</string>
+    <string name="pause">Pause probe</string>
+    <string name="resume">Resume read-only probe</string>
+    <string name="refresh">Refresh counters</string>
+    <string name="clear">Reset local counters</string>
+    <string name="scans">Screen scans: %1$d</string>
+    <string name="markers">Sponsored / ممول observations: %1$d</string>
+    <string name="ad_badges">Exact Ad / إعلان badge observations: %1$d</string>
+    <string name="ad_metadata">• Ad metadata observations: %1$d</string>
+    <string name="text_nodes">Text nodes on last scan: %1$d</string>
+    <string name="description_nodes">Description nodes on last scan: %1$d</string>
+    <string name="events">Facebook events observed: %1$d</string>
+    <string name="nodes">Nodes inspected on last scan: %1$d</string>
+    <string name="last_scan">Last scan time (device): %1$s</string>
+    <string name="no_scans">No scans yet</string>
+    <string name="privacy_footer">Only aggregated counters and your local consent/pause settings are stored. No Facebook content is retained. Not affiliated with Meta.</string>
+    <string name="testing_hint">To test, grant access, open the original Facebook app, scroll manually, return here and tap Refresh. Record your observations manually using the Phase 0 test sheet.</string>
+</resources>

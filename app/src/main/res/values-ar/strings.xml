@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FeedVeil</string>
+    <string name="service_name">فحص FeedVeil للقراءة فقط</string>
+    <string name="accessibility_description">اختبار جدوى للقراءة فقط: يفحص علامات الواجهة داخل فيسبوك الأصلي بعد موافقتك، بدون ضغط أو تمرير أو تصوير أو حفظ نصوص المنشورات.</string>
+    <string name="title">FeedVeil · المرحلة 0</string>
+    <string name="subtitle">اختبار Accessibility لفيسبوك — قراءة فقط</string>
+    <string name="warning">نسخة قراءة فقط: بتفحص علامات Sponsored و ممول و Ad و • Ad؛ الأرقام ملاحظات متكررة ومش عدد الإعلانات الفريدة. مفيش تخطي أو إخفاء تلقائي.</string>
+    <string name="permission_notice">صلاحية Accessibility تقدر تقنيًا تقرأ محتوى الشاشة وتتفاعل مع التطبيقات. في المرحلة دي FeedVeil بيفحص أقل قدر من علامات الواجهة داخل تطبيق فيسبوك الأصلي فقط. مش بيحفظ محتوى المنشورات أو الأسماء أو كلمات السر أو صور الشاشة، ومش بيرسل بيانات لأي مكان. تقدر توقف الفحص أو تلغي الصلاحية في أي وقت.</string>
+    <string name="permission_title">اقرأ قبل تشغيل صلاحية Accessibility</string>
+    <string name="accept">فاهم وموافق — شغّل الفحص للقراءة فقط</string>
+    <string name="decline">رفض / إلغاء الموافقة داخل التطبيق</string>
+    <string name="accessibility_settings">افتح إعدادات Accessibility</string>
+    <string name="status_title">حالة التطبيق</string>
+    <string name="permission_on">خدمة أندرويد: مفعّلة</string>
+    <string name="permission_off">خدمة أندرويد: غير مفعّلة</string>
+    <string name="probe_on">الفحص للقراءة فقط: شغال</string>
+    <string name="probe_off">الفحص للقراءة فقط: متوقف مؤقتًا</string>
+    <string name="probe_not_consented">الفحص للقراءة فقط: مفيش موافقة داخل التطبيق</string>
+    <string name="pause">إيقاف الفحص مؤقتًا</string>
+    <string name="resume">استئناف الفحص للقراءة فقط</string>
+    <string name="refresh">تحديث الأرقام</string>
+    <string name="clear">تصفير العدادات المحلية</string>
+    <string name="scans">مرات فحص الشاشة: %1$d</string>
+    <string name="markers">ملاحظات Sponsored / ممول: %1$d</string>
+    <string name="ad_badges">ملاحظات Ad / إعلان: %1$d</string>
+    <string name="ad_metadata">ملاحظات • Ad في البيانات: %1$d</string>
+    <string name="text_nodes">عناصر النص في آخر فحص: %1$d</string>
+    <string name="description_nodes">العناصر الموصوفة في آخر فحص: %1$d</string>
+    <string name="events">أحداث فيسبوك المستقبلة: %1$d</string>
+    <string name="nodes">عناصر اتفحصت آخر مرة: %1$d</string>
+    <string name="last_scan">آخر فحص (وقت الموبايل): %1$s</string>
+    <string name="no_scans">مفيش فحوصات لسه</string>
+    <string name="privacy_footer">بنحفظ العدادات المجمعة وإعدادات الموافقة والإيقاف محليًا فقط، من غير تخزين محتوى فيسبوك. التطبيق مش تابع لشركة Meta.</string>
+    <string name="testing_hint">للتجربة: وافق على الصلاحية وافتح تطبيق فيسبوك الأصلي ومرّر بنفسك. ارجع هنا واضغط تحديث الأرقام، وسجّل ملاحظاتك يدويًا باستخدام نموذج Phase 0.</string>
+</resources>
