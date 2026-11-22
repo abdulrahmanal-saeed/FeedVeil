@@ -44,6 +44,9 @@
 6. [Testing methodology and acceptance metrics](docs/TEST_PLAN.md)
 7. [Privacy, security, permissions, Play policy](docs/PRIVACY_AND_POLICY.md)
 8. [Decision log and official references](docs/DECISIONS.md)
+9. [**Phase 7 — final UI/UX design system & experience**](docs/UI_UX_PHASE_7.md)
+
+**Roadmap:** Phases 0–6 cover feasibility, features and technical hardening. **Phase 7 is dedicated to final UI/UX design**, Arabic/English screens, design system, prototype, Compose implementation and final signed personal APK (after owner review). Earlier phases still include minimal, safe permission and stop interfaces.
 
 ## Immediate next step
 
