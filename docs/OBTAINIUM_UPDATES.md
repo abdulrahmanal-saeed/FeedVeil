@@ -47,7 +47,7 @@ When all 4 secrets are configured, the next source change pushed to phase-1/dete
 1. Test and lint verification.
 2. Signed release build with **the same permanent keystore on every run**.
 3. Android APK signature validation.
-4. A prerelease tagged like dev-v0.1.1 with one APK named **FeedVeil.apk** and one **FeedVeil.apk.sha256** verification file.
+4. A prerelease tagged like v0.1.1 with one APK named **FeedVeil.apk** and one **FeedVeil.apk.sha256** verification file.
 5. Automatic versionCode increment and new release notes.
 
 The release job runs only for source/build/workflow changes, not README/document edits. No failed build should publish an APK.
@@ -69,7 +69,7 @@ Obtainium can automatically check and download according to its settings, but no
 
 ## How automatic versioning works
 - Default debug app build: v0.1.0-phase1-preview, code 3 (local development).
-- Release job: versionName is 0.1.N-dev, tag is dev-v0.1.N, where N is GitHub's workflow run number.
+- Release job: versionName is 0.1.N, tag is v0.1.N, where N is GitHub's workflow run number.
 - Release versionCode is **100000 + N**, monotonically increasing for this release workflow.
 - One APK in each release prevents incorrect selection.
 - Before a new stable/public track, update the version strategy carefully to ensure that versionCode never decreases.
