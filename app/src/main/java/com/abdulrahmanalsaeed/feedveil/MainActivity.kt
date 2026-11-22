@@ -247,6 +247,7 @@ private fun Phase0Screen(
         Text(stringResource(R.string.trial_important), style = MaterialTheme.typography.bodySmall)
         Text(stringResource(R.string.trial_stats, trial.attempts, trial.completed, trial.failed, trial.approximateBacks))
         if (trial.armed) {
+            Text(stringResource(R.string.trial_armed_status), color = MaterialTheme.colorScheme.error)
             Button(onClick = onStopTrial, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.trial_stop))
             }

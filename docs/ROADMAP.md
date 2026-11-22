@@ -43,6 +43,7 @@ Precision/recall gate in TEST_PLAN.md met; demonstrable ability to distinguish s
 No spontaneous gestures; user control always reliable; verified false action risk low.
 
 ## Phase 3 — Auto Skip (guarded)
+**Owner-authorized early experiment, before Phase 2:** a tightly limited, OFF-by-default 3-swipe supervised diagnostic PR is stacked on Phase 1. This does **not** waive Phase 1 precision/recall gates for a final always-on Auto Skip feature. See [experimental Auto Skip trial](PHASE_3_EXPERIMENT.md).
 ### Tasks
 - P3-001: Implement isolated deterministic ActionPolicyEngine; HIGH-confidence + visible post + idle checks.
 - P3-002: Safe scroll action with constrained distance, verification, action cap and cooldown.

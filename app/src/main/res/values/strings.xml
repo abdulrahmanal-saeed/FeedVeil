@@ -46,6 +46,7 @@
     <string name="trial_stats">Attempts: %1$d / completed: %2$d / failed: %3$d / approximate backs: %4$d</string>
     <string name="trial_start">Arm 3-skip supervised trial</string>
     <string name="trial_stop">Stop experimental Auto Skip</string>
+    <string name="trial_armed_status">Experimental swipes are ARMED until stopped, session expires, or 3 skips are attempted.</string>
     <string name="trial_dialog_title">Enable experimental automatic swipes?</string>
     <string name="trial_dialog_body">FeedVeil may incorrectly skip normal Facebook posts. You must stay on the selected Feed or Reels screen. The floating Stop button stops the trial; Back tries one reverse swipe, NOT a guaranteed return to the skipped post. Max 3 automatic swipes within 5 minutes, with a cooldown. No screenshots, content, account identifiers or post history are stored. This is not an ad blocker or validated classifier.</string>
     <string name="trial_dialog_confirm">I understand — arm trial</string>

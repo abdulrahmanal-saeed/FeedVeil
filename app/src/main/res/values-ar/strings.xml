@@ -46,6 +46,7 @@
     <string name="trial_stats">محاولات: %1$d / ناجحة: %2$d / فاشلة: %3$d / رجوع تقريبي: %4$d</string>
     <string name="trial_start">شغّل تجربة 3 تخطيات</string>
     <string name="trial_stop">إيقاف Auto Skip التجريبي</string>
+    <string name="trial_armed_status">التمرير التلقائي التجريبي مفعل مؤقتًا؛ أوقفه عند الحاجة.</string>
     <string name="trial_dialog_title">تفعيل التمرير التلقائي التجريبي؟</string>
     <string name="trial_dialog_body">ممكن FeedVeil يتخطى منشورات عادية بالغلط. خليك في شاشة Feed أو Reels اللي اخترتها. زر STOP بيوقف التجربة، وزر Back بيعمل تمريرة عكسية بس مش بيرجع نفس المنشور بالضرورة. حد أقصى 3 تمريرات في 5 دقائق. مش بنحفظ صور أو نصوص أو بيانات حسابات أو تاريخ المنشورات.</string>
     <string name="trial_dialog_confirm">فاهم المخاطر — شغّل التجربة</string>
