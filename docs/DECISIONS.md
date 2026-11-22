@@ -16,6 +16,8 @@
 | D012 | Scoped architecture for com.facebook.katana; Reels etc. separate research | Limit false positives |
 | D013 | No promises of 100% blocking or guaranteed app support | API/third-party UI uncertainty |
 | D014 | Initial minSdk 29 candidate; final target SDK at project creation | Pending implementation check |
+| D015 | Phase 7 is dedicated to complete final UI/UX, brand, design system and polished Compose experience | Explicit user decision |
+| D016 | Phase 6 is technical QA/readiness; final signed personal release follows Phase 7 design approval | Updated roadmap; baseline safety UI exists earlier |
 
 ## Open research questions
 - Are precise sponsor labels reliably present in actual Facebook accessibility trees for Arabic and English?
@@ -51,6 +53,7 @@
 - [x] Phase backlog and exit gates proposed.
 - [x] Test plan and acceptance metrics proposed.
 - [x] Privacy and store policy limitations documented.
+- [x] Phase 7 UI/UX scope and final release gate documented.
 - [ ] Real-device sponsored marker data collected (NOT DONE).
 - [ ] On-device Android build validated (NOT DONE).
 - [ ] User approves proceeding to Phase 0 implementation.
