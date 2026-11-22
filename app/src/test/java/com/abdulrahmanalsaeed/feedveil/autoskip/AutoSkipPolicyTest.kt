@@ -7,6 +7,7 @@ import com.abdulrahmanalsaeed.feedveil.detection.ScreenRect
 import com.abdulrahmanalsaeed.feedveil.detection.SurfaceHint
 import com.abdulrahmanalsaeed.feedveil.probe.AdLabelObserver
 import com.abdulrahmanalsaeed.feedveil.probe.ManualTestMode
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -73,3 +74,6 @@ class AutoSkipPolicyTest {
         assertFalse(p.maySkip(double, ManualTestMode.FEED, viewport, 2500))
     }
 }
+
+
+/* Additional policy reason tests live below. */

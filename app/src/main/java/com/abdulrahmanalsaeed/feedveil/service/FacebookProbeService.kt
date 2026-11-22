@@ -46,6 +46,7 @@ class FacebookProbeService : AccessibilityService() {
 
     private var lastScannedElapsedMs = 0L
     private var lastScrollElapsedMs = 0L
+    private var lastGestureElapsedMs = 0L
     private var lastSessionRevision: Long? = null
     private var inFacebook = false
     private var gestureInFlight = false
@@ -56,6 +57,7 @@ class FacebookProbeService : AccessibilityService() {
     private var overlay: LinearLayout? = null
     private var overlayLabel: TextView? = null
     private var backButton: Button? = null
+    private var manualButton: Button? = null
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -122,13 +124,21 @@ class FacebookProbeService : AccessibilityService() {
         }
         if (!gestureInFlight) {
             val mode = LocalAutoTrial.state(this).mode
-            if (policy.maySkip(frame.analysis, mode, frame.viewport, now) &&
-                now - lastScrollElapsedMs > IDLE_AFTER_SCROLL_MS) {
-                performForwardSkip(mode)
-            } else if (frame.analysis.candidates.isNotEmpty()) {
-                scheduleStableRecheck()
+            // Don't consume the policy's stable/ready state while a swipe is still settling.
+            if (now - lastScrollElapsedMs > IDLE_AFTER_SCROLL_MS) {
+                val eligible = policy.maySkip(frame.analysis, mode, frame.viewport, now)
+                reportReason(policy.lastReason.name)
+                if (eligible) {
+                    performForwardSkip(mode)
+                } else if (frame.analysis.candidates.isNotEmpty()) {
+                    scheduleStableRecheck()
+                }
+            } else {
+                reportReason("WAIT_FOR_SCROLL_IDLE")
+                if (frame.analysis.candidates.isNotEmpty()) scheduleStableRecheck()
             }
         }
+        updateControls()
     }
 
     private data class Pending(val node: AccessibilityNodeInfo, val parent: Int?, val depth: Int)
@@ -208,7 +218,9 @@ class FacebookProbeService : AccessibilityService() {
     }
 
     private fun scheduleStableRecheck() {
-        cancelCheck()
+        // IMPORTANT: do not cancel+postpone the task on each content-changed event.
+        // Facebook videos can emit accessibility events continuously and starve a timer.
+        if (pendingCheck != null) return
         val callback = Runnable {
             pendingCheck = null
             if (!inFacebook || gestureInFlight || !LocalAutoTrial.canAct(this)) return@Runnable
@@ -218,19 +230,30 @@ class FacebookProbeService : AccessibilityService() {
                 return@Runnable
             }
             val now = SystemClock.elapsedRealtime()
-            if (now - lastScrollElapsedMs < IDLE_AFTER_SCROLL_MS) return@Runnable
+            if (now - lastScrollElapsedMs < IDLE_AFTER_SCROLL_MS) {
+                reportReason("WAIT_FOR_SCROLL_IDLE")
+                scheduleStableRecheck()
+                return@Runnable
+            }
             val frame = inspectVisibleNodes(root, now) // ephemeral: no extra event-count increments
             val mode = LocalAutoTrial.state(this).mode
-            if (policy.maySkip(frame.analysis, mode, frame.viewport, now)) {
+            val eligible = policy.maySkip(frame.analysis, mode, frame.viewport, now)
+            reportReason(policy.lastReason.name)
+            updateControls()
+            if (eligible) {
                 performForwardSkip(mode)
+            } else if (frame.analysis.candidates.isNotEmpty()) {
+                scheduleStableRecheck()
             }
         }
         pendingCheck = callback
         handler.postDelayed(callback, STABLE_RECHECK_DELAY_MS)
     }
 
-    private fun performForwardSkip(mode: ManualTestMode) {
-        if (!LocalAutoTrial.canAct(this) || gestureInFlight || mode == ManualTestMode.UNSPECIFIED) return
+    private fun performForwardSkip(mode: ManualTestMode, manual: Boolean = false) {
+        if (!LocalAutoTrial.canAct(this) || gestureInFlight ||
+            mode == ManualTestMode.UNSPECIFIED ||
+            SystemClock.elapsedRealtime() - lastGestureElapsedMs < AutoSkipPolicy.COOLDOWN_MS) return
         if (!showControls()) {
             LocalAutoTrial.disarm(this)
             return
@@ -242,12 +265,16 @@ class FacebookProbeService : AccessibilityService() {
         }
         cancelCheck()
         gestureInFlight = true
-        LocalAutoTrial.attempted(this)
+        LocalAutoTrial.attempted(this, manual = manual)
+        reportReason(if (manual) "MANUAL_SWIPE_REQUESTED" else "AUTO_SWIPE_REQUESTED")
         dispatchVerticalSwipe(forward = true, mode = mode,
             onSuccess = {
                 gestureInFlight = false
                 LocalAutoTrial.completed(this)
-                policy.afterCompletedSkip(SystemClock.elapsedRealtime())
+                val completedAt = SystemClock.elapsedRealtime()
+                lastGestureElapsedMs = completedAt
+                policy.afterCompletedSkip(completedAt)
+                reportReason(if (manual) "MANUAL_SWIPE_DONE" else "AUTO_SWIPE_DONE")
                 undoEligible = true
                 previousMode = mode
                 updateControls()
@@ -264,6 +291,7 @@ class FacebookProbeService : AccessibilityService() {
             onFailure = {
                 gestureInFlight = false
                 LocalAutoTrial.failed(this)
+                reportReason("GESTURE_CANCELLED")
                 undoEligible = false
                 removeOverlay()
             }
@@ -359,6 +387,15 @@ class FacebookProbeService : AccessibilityService() {
                 contentDescription = getString(R.string.trial_back_button)
                 setOnClickListener { approxBack() }
             }
+            val manual = Button(this).apply {
+                text = getString(R.string.trial_manual_button)
+                contentDescription = getString(R.string.trial_manual_button)
+                setOnClickListener {
+                    // Direct user interaction bypasses candidate classification, but
+                    // never bypasses explicit arming, 3-attempt cap, cooldown, or foreground.
+                    performForwardSkip(LocalAutoTrial.state(this@FacebookProbeService).mode, manual = true)
+                }
+            }
             val stop = Button(this).apply {
                 text = getString(R.string.trial_stop_button)
                 contentDescription = getString(R.string.trial_stop_button)
@@ -366,6 +403,7 @@ class FacebookProbeService : AccessibilityService() {
             }
             column.addView(title)
             column.addView(back)
+            column.addView(manual)
             column.addView(stop)
             val params = WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -383,6 +421,7 @@ class FacebookProbeService : AccessibilityService() {
             overlay = column
             overlayLabel = title
             backButton = back
+            manualButton = manual
             updateControls()
             true
         } catch (_: RuntimeException) {
@@ -393,8 +432,11 @@ class FacebookProbeService : AccessibilityService() {
 
     private fun updateControls() {
         val s = LocalAutoTrial.state(this)
-        overlayLabel?.text = getString(R.string.trial_overlay_count, s.completed, LocalAutoTrial.MAX_SKIPS)
+        overlayLabel?.text = getString(R.string.trial_overlay_count, s.completed, LocalAutoTrial.MAX_SKIPS) +
+            "\n" + getString(R.string.trial_reason_overlay, s.lastReason)
         backButton?.visibility = if (undoEligible) View.VISIBLE else View.GONE
+        manualButton?.isEnabled = !gestureInFlight && s.armed &&
+            (SystemClock.elapsedRealtime() - lastGestureElapsedMs >= AutoSkipPolicy.COOLDOWN_MS)
     }
 
     private fun removeOverlay() {
@@ -405,6 +447,12 @@ class FacebookProbeService : AccessibilityService() {
         overlay = null
         overlayLabel = null
         backButton = null
+        manualButton = null
+    }
+
+    /** Persist one symbolic verdict for debugging; never save a Facebook node or label. */
+    private fun reportReason(reason: String) {
+        LocalAutoTrial.diagnostic(this, reason)
     }
 
     private fun cancelCheck() {

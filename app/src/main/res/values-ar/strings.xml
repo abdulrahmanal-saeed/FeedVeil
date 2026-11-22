@@ -54,6 +54,10 @@
     <string name="trial_overlay_count">تجربة Auto Skip: %1$d / %2$d</string>
     <string name="trial_back_button">رجوع تقريبي</string>
     <string name="trial_stop_button">إيقاف Auto Skip</string>
+    <string name="trial_manual_button">تمرير واحد للتجربة</string>
+    <string name="trial_manual_stats">تمريرات بتأكيدك: %1$d (ضمن 3 محاولات)</string>
+    <string name="trial_last_reason">آخر سبب قرار Auto Skip: %1$s</string>
+    <string name="trial_reason_overlay">سبب القرار: %1$s</string>
     <string name="phase1_heading">Phase 1 — اختبار ربط العلامة بالمنشور</string>
     <string name="phase1_note">دي حاويات محتملة فقط مش إعلانات مؤكدة. الأرقام ملاحظات متكررة، وتجميع المواضع مش عدد الإعلانات الفريدة. لا يوجد تخطي تلقائي.</string>
     <string name="phase1_provisional">ملاحظات لعلامة داخل حاوية محتملة: %1$d</string>

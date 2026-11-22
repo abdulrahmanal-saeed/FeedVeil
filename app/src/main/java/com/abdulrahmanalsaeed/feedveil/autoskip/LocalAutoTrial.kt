@@ -15,6 +15,8 @@ object LocalAutoTrial {
     private const val COMPLETE = "completed"
     private const val FAILED = "failed"
     private const val BACKS = "approximate_back"
+    private const val MANUAL_ATTEMPTS = "manual_attempts"
+    private const val REASON = "last_reason"
     const val MAX_SKIPS = 3
     private const val SESSION_MS = 5 * 60_000L
 
@@ -24,7 +26,9 @@ object LocalAutoTrial {
         val attempts: Int,
         val completed: Int,
         val failed: Int,
-        val approximateBacks: Int
+        val approximateBacks: Int,
+        val manualAttempts: Int,
+        val lastReason: String
     )
     private fun prefs(context: Context) =
         context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -36,7 +40,8 @@ object LocalAutoTrial {
             .putBoolean(ARMED, true).putString(MODE, mode.name)
             .putLong(START, SystemClock.elapsedRealtime())
             .putInt(ATTEMPTS, 0).putInt(COMPLETE, 0)
-            .putInt(FAILED, 0).putInt(BACKS, 0).commit()
+            .putInt(FAILED, 0).putInt(BACKS, 0)
+            .putInt(MANUAL_ATTEMPTS, 0).putString(REASON, "WAITING").commit()
         return true
     }
 
@@ -52,7 +57,9 @@ object LocalAutoTrial {
             attempts = p.getInt(ATTEMPTS, 0),
             completed = p.getInt(COMPLETE, 0),
             failed = p.getInt(FAILED, 0),
-            approximateBacks = p.getInt(BACKS, 0)
+            approximateBacks = p.getInt(BACKS, 0),
+            manualAttempts = p.getInt(MANUAL_ATTEMPTS, 0),
+            lastReason = p.getString(REASON, "WAITING") ?: "WAITING"
         )
     }
 
@@ -73,9 +80,16 @@ object LocalAutoTrial {
         return true
     }
 
-    @Synchronized fun attempted(context: Context) {
+    @Synchronized fun attempted(context: Context, manual: Boolean = false) {
         val p = prefs(context)
-        p.edit().putInt(ATTEMPTS, p.getInt(ATTEMPTS, 0) + 1).commit()
+        val edit = p.edit().putInt(ATTEMPTS, p.getInt(ATTEMPTS, 0) + 1)
+        if (manual) edit.putInt(MANUAL_ATTEMPTS, p.getInt(MANUAL_ATTEMPTS, 0) + 1)
+        edit.commit()
+    }
+
+    @Synchronized fun diagnostic(context: Context, reason: String) {
+        val p = prefs(context)
+        if (p.getString(REASON, "") != reason) p.edit().putString(REASON, reason).apply()
     }
 
     @Synchronized fun completed(context: Context) {
