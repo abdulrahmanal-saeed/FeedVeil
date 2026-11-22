@@ -7,7 +7,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import com.abdulrahmanalsaeed.feedveil.probe.LocalProbeStore
 import com.abdulrahmanalsaeed.feedveil.probe.ProbeScope
 import com.abdulrahmanalsaeed.feedveil.probe.ScreenObservation
-import com.abdulrahmanalsaeed.feedveil.probe.SponsoredLabelMatcher
+import com.abdulrahmanalsaeed.feedveil.probe.AdLabelObserver
 
 /**
  * Phase 0 ONLY: passive, read-only and Facebook-only.
@@ -46,15 +46,26 @@ class FacebookProbeService : AccessibilityService() {
         work.addLast(root to 0)
         var inspected = 0
         var markers = 0
+        var adBadges = 0
+        var adMetadata = 0
+        var textNodes = 0
+        var descriptionNodes = 0
 
         while (work.isNotEmpty() && inspected < MAX_NODES) {
             val (node, depth) = work.removeFirst()
             if (!node.isVisibleToUser) continue
             inspected += 1
 
-            val exactMatch = SponsoredLabelMatcher.isExactMarker(node.text?.toString()) ||
-                SponsoredLabelMatcher.isExactMarker(node.contentDescription?.toString())
-            if (exactMatch) markers += 1
+            val text = node.text?.toString()
+            val description = node.contentDescription?.toString()
+            if (!text.isNullOrBlank()) textNodes += 1
+            if (!description.isNullOrBlank()) descriptionNodes += 1
+            when (AdLabelObserver.combine(AdLabelObserver.classify(text), AdLabelObserver.classify(description))) {
+                AdLabelObserver.Kind.SPONSORED_BADGE -> markers += 1
+                AdLabelObserver.Kind.AD_BADGE -> adBadges += 1
+                AdLabelObserver.Kind.AD_METADATA_SEGMENT -> adMetadata += 1
+                AdLabelObserver.Kind.NONE -> Unit
+            }
 
             if (depth < MAX_DEPTH) {
                 for (i in 0 until minOf(node.childCount, MAX_CHILDREN_PER_NODE)) {
@@ -63,7 +74,14 @@ class FacebookProbeService : AccessibilityService() {
             }
         }
         // The screen labels/children are not retained, logged, uploaded, or stored.
-        return ScreenObservation(nodeCount = inspected, exactMarkerCount = markers)
+        return ScreenObservation(
+            nodeCount = inspected,
+            exactMarkerCount = markers,
+            adBadgeCount = adBadges,
+            adMetadataCount = adMetadata,
+            textNodeCount = textNodes,
+            descriptionNodeCount = descriptionNodes
+        )
     }
 
     override fun onInterrupt() {

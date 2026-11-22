@@ -167,6 +167,10 @@ private fun Phase0Screen(
         HorizontalDivider()
         Text(stringResource(R.string.scans, snapshot.completedScans))
         Text(stringResource(R.string.markers, snapshot.markerObservations))
+        Text(stringResource(R.string.ad_badges, snapshot.adBadgeObservations))
+        Text(stringResource(R.string.ad_metadata, snapshot.adMetadataObservations))
+        Text(stringResource(R.string.text_nodes, snapshot.lastTextNodes))
+        Text(stringResource(R.string.description_nodes, snapshot.lastContentDescriptions))
         Text(stringResource(R.string.events, snapshot.eligibleEvents))
         Text(stringResource(R.string.nodes, snapshot.lastNodesInspected))
         Text(

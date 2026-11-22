@@ -5,7 +5,7 @@
     <string name="accessibility_description">Read-only feasibility experiment: checks accessibility labels in the original Facebook app when you consent. No taps, scrolling, screen capture or stored post text.</string>
     <string name="title">FeedVeil · Phase 0</string>
     <string name="subtitle">Read-only Facebook accessibility probe</string>
-    <string name="warning">This version does NOT hide, scroll past, or block any ads. It only counts screen scans and exact sponsored-label observations. These are not unique ads.</string>
+    <string name="warning">Read-only diagnostic build: observes Sponsored, ممول, Ad and • Ad when exposed by Facebook accessibility. Observations can repeat for the same ad. No scrolling, hiding or blocking.</string>
     <string name="permission_notice">Accessibility can technically read on-screen content and interact with apps. FeedVeil Phase 0 uses it only to inspect minimal visible UI labels in the original Facebook app. It does not save post contents, names, passwords, screenshots, or send data anywhere. You can pause or revoke permission at any time.</string>
     <string name="permission_title">Read before enabling accessibility</string>
     <string name="accept">I understand — enable read-only probe</string>
@@ -22,7 +22,11 @@
     <string name="refresh">Refresh counters</string>
     <string name="clear">Reset local counters</string>
     <string name="scans">Screen scans: %1$d</string>
-    <string name="markers">Sponsored-label observations: %1$d</string>
+    <string name="markers">Sponsored / ممول observations: %1$d</string>
+    <string name="ad_badges">Exact Ad / إعلان badge observations: %1$d</string>
+    <string name="ad_metadata">• Ad metadata observations: %1$d</string>
+    <string name="text_nodes">Text nodes on last scan: %1$d</string>
+    <string name="description_nodes">Description nodes on last scan: %1$d</string>
     <string name="events">Facebook events observed: %1$d</string>
     <string name="nodes">Nodes inspected on last scan: %1$d</string>
     <string name="last_scan">Last scan time (device): %1$s</string>
