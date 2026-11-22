@@ -215,7 +215,7 @@ private fun Phase0Screen(
                 when (snapshot.manualTestMode) {
                     ManualTestMode.FEED -> R.string.manual_selected_feed
                     ManualTestMode.REELS -> R.string.manual_selected_reels
-                    ManualTestMode.UNSPECIFIED -> R.string.manual_selected_unspecified
+                    ManualTestMode.UNSPECIFIED, ManualTestMode.GENERAL -> R.string.manual_selected_unspecified
                 }
             )
         )
