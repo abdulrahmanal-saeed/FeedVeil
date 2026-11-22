@@ -68,9 +68,13 @@ class FacebookProbeService : AccessibilityService() {
         if (event == null) return
         val eventPackage = event.packageName?.toString()
         if (!ProbeScope.isTargetPackage(eventPackage)) {
-            // The service receives OTHER apps' package metadata only so a global
-            // accessibility overlay can be removed on app switch. Never read their nodes.
-            if (inFacebook && event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            // Other apps: read event package/class metadata only, NEVER their UI nodes.
+            // Our own accessibility overlay can generate window events: don't mistake
+            // those for leaving Facebook. MainActivity is an actual app switch.
+            val returnedToOurActivity = eventPackage == packageName &&
+                event.className?.toString() == "com.abdulrahmanalsaeed.feedveil.MainActivity"
+            if (inFacebook && event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                (eventPackage != packageName || returnedToOurActivity)) {
                 stopTrialAndHide()
             }
             return

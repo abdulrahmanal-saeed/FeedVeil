@@ -55,7 +55,7 @@ class AutoSkipPolicy {
         val eligible = scan.candidates.filter {
             it.confidence == CandidateConfidence.PROVISIONAL &&
                 markerAllowed(it.marker, mode) &&
-                it.rect != null && safePlacement(it.rect, viewport)
+                it.rect != null && safePlacement(it.rect, viewport, mode)
         }
         if (scan.unresolvedMarkerNodes > 0 || scan.candidates.size != 1 || eligible.size != 1) {
             if (scan.candidates.isEmpty()) needsEmptyFrame = false
@@ -100,12 +100,16 @@ class AutoSkipPolicy {
             ManualTestMode.UNSPECIFIED -> false
         }
 
-    private fun safePlacement(r: ScreenRect, viewport: ScreenRect): Boolean {
+    private fun safePlacement(r: ScreenRect, viewport: ScreenRect, mode: ManualTestMode): Boolean {
         if (r.area <= 0L || viewport.area <= 0L) return false
+        // Full-screen Reels candidates can legitimately be taller than Feed cards.
+        // Keep the policy below the Phase 1 container resolver's max area.
+        val maxHeightRatio = if (mode == ManualTestMode.REELS) 0.96 else 0.83
+        val maxAreaRatio = if (mode == ManualTestMode.REELS) 0.88 else 0.85
         if (r.width < viewport.width * 0.60 ||
             r.height < viewport.height * 0.12 ||
-            r.height > viewport.height * 0.83 ||
-            r.area > viewport.area * 0.85) return false
+            r.height > viewport.height * maxHeightRatio ||
+            r.area > viewport.area * maxAreaRatio) return false
         val overlap = r.intersection(viewport).toDouble()
         if (overlap / r.area < 0.85) return false
         val centerY = (r.top.toLong() + r.bottom.toLong()) / 2
