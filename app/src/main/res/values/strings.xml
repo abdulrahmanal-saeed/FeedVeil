@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FeedVeil</string>
-    <string name="service_name">FeedVeil read-only probe</string>
-    <string name="accessibility_description">Read-only feasibility experiment: checks accessibility labels in the original Facebook app when you consent. No taps, scrolling, screen capture or stored post text.</string>
+    <string name="service_name">FeedVeil accessibility test</string>
+    <string name="accessibility_description">Accessibility can read Facebook UI labels. Optional, separately approved experimental Auto Skip can dispatch up to 3 swipes and show Stop / approximate Back controls. No screenshots, account info or post text are saved.</string>
     <string name="title">FeedVeil · Phase 1 Preview</string>
     <string name="subtitle">Read-only ad candidate and post boundary probe</string>
-    <string name="warning">Read-only diagnostic build: observes Sponsored, ممول, Ad and • Ad when exposed by Facebook accessibility. Observations can repeat for the same ad. No scrolling, hiding or blocking.</string>
-    <string name="permission_notice">Accessibility can technically read on-screen content and interact with apps. FeedVeil Phase 0 uses it only to inspect minimal visible UI labels in the original Facebook app. It does not save post contents, names, passwords, screenshots, or send data anywhere. You can pause or revoke permission at any time.</string>
+    <string name="warning">Read-only ad diagnostics by default. Separate supervised Auto Skip experiment can perform up to 3 approximate swipes with Stop / Back control. It can skip normal posts; a reverse swipe does not guarantee exact restoration.</string>
+    <string name="permission_notice">Accessibility can technically read on-screen content and interact with apps. FeedVeil reads limited Facebook UI labels by default. If you separately arm the trial, it may swipe Facebook automatically; it can make mistakes. The service also reads only app package names on window changes to remove controls after switching apps. It does not save post contents, names, passwords, screenshots, or send data anywhere. You can pause or revoke permission at any time.</string>
     <string name="permission_title">Read before enabling accessibility</string>
     <string name="accept">I understand — enable read-only probe</string>
     <string name="decline">Decline / revoke in-app consent</string>
@@ -41,6 +41,18 @@
     <string name="manual_feed">Start Feed test</string>
     <string name="manual_reels">Start Reels test</string>
     <string name="manual_unspecified">Clear session label &amp; reset counters</string>
+    <string name="trial_heading">Experimental Auto Skip (OFF by default)</string>
+    <string name="trial_important">Only for an owner-supervised test. Select Feed or Reels above, then explicitly arm. Max 3 swipes in 5 min, 15-second cooldown. Wrong skips are possible. The overlay has Stop and approximate Back; exact history cannot be reconstructed. Do not use for unattended browsing.</string>
+    <string name="trial_stats">Attempts: %1$d / completed: %2$d / failed: %3$d / approximate backs: %4$d</string>
+    <string name="trial_start">Arm 3-skip supervised trial</string>
+    <string name="trial_stop">Stop experimental Auto Skip</string>
+    <string name="trial_dialog_title">Enable experimental automatic swipes?</string>
+    <string name="trial_dialog_body">FeedVeil may incorrectly skip normal Facebook posts. You must stay on the selected Feed or Reels screen. The floating Stop button stops the trial; Back tries one reverse swipe, NOT a guaranteed return to the skipped post. Max 3 automatic swipes within 5 minutes, with a cooldown. No screenshots, content, account identifiers or post history are stored. This is not an ad blocker or validated classifier.</string>
+    <string name="trial_dialog_confirm">I understand — arm trial</string>
+    <string name="trial_dialog_cancel">Cancel</string>
+    <string name="trial_overlay_count">Trial Auto Skip: %1$d / %2$d</string>
+    <string name="trial_back_button">Back ~ (approx.)</string>
+    <string name="trial_stop_button">STOP Auto Skip</string>
     <string name="phase1_heading">Phase 1 — Candidate post association</string>
     <string name="phase1_note">Only provisional containers, not verified ads. Placement clusters are not unique ads. No automatic actions.</string>
     <string name="phase1_provisional">Provisional post-container observations: %1$d</string>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FeedVeil</string>
-    <string name="service_name">فحص FeedVeil للقراءة فقط</string>
-    <string name="accessibility_description">اختبار جدوى للقراءة فقط: يفحص علامات الواجهة داخل فيسبوك الأصلي بعد موافقتك، بدون ضغط أو تمرير أو تصوير أو حفظ نصوص المنشورات.</string>
+    <string name="service_name">اختبار FeedVeil Accessibility</string>
+    <string name="accessibility_description">خدمة Accessibility تقرأ علامات واجهة فيسبوك، وبموافقة إضافية ممكن تختبر 3 تمريرات تلقائية مع زر إيقاف ورجوع تقريبي. بدون تصوير أو حفظ محتوى المنشورات.</string>
     <string name="title">FeedVeil · المرحلة 1 التجريبية</string>
     <string name="subtitle">فحص بنية المنشورات — قراءة فقط</string>
-    <string name="warning">نسخة قراءة فقط: بتفحص علامات Sponsored و ممول و Ad و • Ad؛ الأرقام ملاحظات متكررة ومش عدد الإعلانات الفريدة. مفيش تخطي أو إخفاء تلقائي.</string>
-    <string name="permission_notice">صلاحية Accessibility تقدر تقنيًا تقرأ محتوى الشاشة وتتفاعل مع التطبيقات. في المرحلة دي FeedVeil بيفحص أقل قدر من علامات الواجهة داخل تطبيق فيسبوك الأصلي فقط. مش بيحفظ محتوى المنشورات أو الأسماء أو كلمات السر أو صور الشاشة، ومش بيرسل بيانات لأي مكان. تقدر توقف الفحص أو تلغي الصلاحية في أي وقت.</string>
+    <string name="warning">الفحص للقراءة فقط افتراضيًا. تجربة Auto Skip منفصلة ومحدودة بثلاث تمريرات؛ ممكن تتخطى منشورات عادية والرجوع مش مضمون.</string>
+    <string name="permission_notice">صلاحية Accessibility تقدر تقنيًا تقرأ محتوى الشاشة وتتفاعل مع التطبيقات. FeedVeil بيفحص علامات واجهة فيسبوك فقط بشكل افتراضي، ولو فعّلت التجربة المنفصلة ممكن يمرّر الشاشة تلقائيًا بالخطأ. الخدمة تتابع أسماء حزم التطبيقات وقت الانتقال لإزالة أزرار التحكم من التطبيقات الأخرى. مش بيحفظ محتوى المنشورات أو الأسماء أو كلمات السر أو صور الشاشة، ومش بيرسل بيانات لأي مكان. تقدر توقف الفحص أو تلغي الصلاحية في أي وقت.</string>
     <string name="permission_title">اقرأ قبل تشغيل صلاحية Accessibility</string>
     <string name="accept">فاهم وموافق — شغّل الفحص للقراءة فقط</string>
     <string name="decline">رفض / إلغاء الموافقة داخل التطبيق</string>
@@ -41,6 +41,18 @@
     <string name="manual_feed">اختبار Feed</string>
     <string name="manual_reels">اختبار Reels</string>
     <string name="manual_unspecified">إلغاء التصنيف اليدوي وتصفير العدادات</string>
+    <string name="trial_heading">Auto Skip تجريبي — مقفول افتراضيًا</string>
+    <string name="trial_important">التجربة تحت إشرافك فقط. اختار Feed أو Reels الأول. أقصى حد 3 تمريرات خلال 5 دقائق وبين كل واحدة 15 ثانية. ممكن نتخطى منشور عادي. زر الرجوع بيعمل سحب عكسي تقريبي مش استرجاع مضمون.</string>
+    <string name="trial_stats">محاولات: %1$d / ناجحة: %2$d / فاشلة: %3$d / رجوع تقريبي: %4$d</string>
+    <string name="trial_start">شغّل تجربة 3 تخطيات</string>
+    <string name="trial_stop">إيقاف Auto Skip التجريبي</string>
+    <string name="trial_dialog_title">تفعيل التمرير التلقائي التجريبي؟</string>
+    <string name="trial_dialog_body">ممكن FeedVeil يتخطى منشورات عادية بالغلط. خليك في شاشة Feed أو Reels اللي اخترتها. زر STOP بيوقف التجربة، وزر Back بيعمل تمريرة عكسية بس مش بيرجع نفس المنشور بالضرورة. حد أقصى 3 تمريرات في 5 دقائق. مش بنحفظ صور أو نصوص أو بيانات حسابات أو تاريخ المنشورات.</string>
+    <string name="trial_dialog_confirm">فاهم المخاطر — شغّل التجربة</string>
+    <string name="trial_dialog_cancel">إلغاء</string>
+    <string name="trial_overlay_count">تجربة Auto Skip: %1$d / %2$d</string>
+    <string name="trial_back_button">رجوع تقريبي</string>
+    <string name="trial_stop_button">إيقاف Auto Skip</string>
     <string name="phase1_heading">Phase 1 — اختبار ربط العلامة بالمنشور</string>
     <string name="phase1_note">دي حاويات محتملة فقط مش إعلانات مؤكدة. الأرقام ملاحظات متكررة، وتجميع المواضع مش عدد الإعلانات الفريدة. لا يوجد تخطي تلقائي.</string>
     <string name="phase1_provisional">ملاحظات لعلامة داخل حاوية محتملة: %1$d</string>
