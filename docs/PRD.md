@@ -32,6 +32,8 @@ The user wants to continue using the **original installed Facebook app** (no cus
 | F12 | Reels/video/Story-aware handling | Research, not committed |
 | F13 | User-defined false-positive feedback (local only) | Future |
 | F14 | Local rule version, compatibility alerts, and manual rollback | Future |
+| F15 | Cohesive Material 3 UI/UX system, all screens/states, light/dark, Arabic RTL and English LTR | Phase 7 |
+| F16 | Original logo/adaptive icon, user journeys, polished dashboard and overlay controls | Phase 7 |
 
 ## 4. User journeys
 1. **Onboarding:** launch → see exact permissions, monitored target and limits → explicit opt-in → system Accessibility settings → return → service status visible. Declining permissions means all monitoring remains off.
@@ -44,6 +46,8 @@ The user wants to continue using the **original installed Facebook app** (no cus
 8. **Uninstall/disable:** app stops without altering Facebook installation or account data.
 
 ## 5. UI specification
+
+Final UI/UX design and implementation is explicitly **Phase 7**, per [dedicated specification](UI_UX_PHASE_7.md). Minimal permission education, safety switches and diagnostics must work in earlier phases; Phase 7 does not defer critical usability or consent.
 Home: status (Service OFF / Read-only / Assisting / Auto), big pause switch, explanation of current capability; local counters: detected, skipped, hidden, masked, uncertain, and avoided false actions. Counters distinguish **detected** from **actually suppressed**.
 Modes: Manual Assist (default when feasible), Auto Skip (off by default), Hide Ad (off), Visual Mask (off); mutually conflicting actions must have a documented priority, not simultaneous taps.
 Diagnostics: current Facebook app version, Android version, rule version, service accessibility state, last classified outcome **without post text**; export only after deliberate user action and redaction.
@@ -71,4 +75,5 @@ The Facebook app's accessibility tree and labels change without notice. Some spo
 ## 10. Approval points
 - **Gate A:** approve P0 evidence and detection viability before action implementation.
 - **Gate B:** approve each automation/overlay separately after test evidence.
-- **Gate C:** approve privacy notice, APK signing, and distribution method.
+- **Gate C:** approve technical hardening, privacy notice and owner-controlled signing/distribution approach.
+- **Gate D:** review and approve Phase 7 final UI/UX and actual device accessibility before releasing a signed personal APK.
