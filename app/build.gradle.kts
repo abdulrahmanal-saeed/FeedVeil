@@ -4,6 +4,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// Obtainium publishing: retain the package ID and permanent owner signing certificate across versions.
+// A CI debug APK must never be published as an Obtainium update.
 // Obtainium release signing uses a permanent, owner-controlled keystore from CI secrets.
 val releaseKeystorePath = providers.environmentVariable("FEEDVEIL_KEYSTORE_FILE").orNull
 val releaseStorePassword = providers.environmentVariable("FEEDVEIL_KEYSTORE_PASSWORD").orNull
